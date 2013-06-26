@@ -8,6 +8,7 @@ public class Agent : MonoBehaviour {
   public float speed;
   public float freeWill;
   public float hunger;
+  public float vision;
   public float startingEnergy;
 
   public float energy;
@@ -28,6 +29,7 @@ public class Agent : MonoBehaviour {
     startingEnergy = Random.Range(0.5F, 1F);
     freeWill = Random.Range(0F, 1F);
     hunger = Random.Range(0F, 1F);
+    vision = Random.Range(0, 10);
 
     FinishCreating();
   }
@@ -38,6 +40,7 @@ public class Agent : MonoBehaviour {
     startingEnergy = RandomParent(parents).startingEnergy;
     freeWill = RandomParent(parents).freeWill;
     hunger = RandomParent(parents).hunger;
+    vision = RandomParent(parents).vision;
 
     if (Random.value < 0.05) {
       speed = Random.Range(0.1F, 1F);
@@ -50,6 +53,9 @@ public class Agent : MonoBehaviour {
     }
     if (Random.value < 0.05) {
       hunger = Random.Range(0F, 1F);
+    }
+    if (Random.value < 0.05) {
+      vision = Random.Range(0, 10);
     }
 
     FinishCreating();
@@ -97,6 +103,13 @@ public class Agent : MonoBehaviour {
       return;
     }
 
+    // Make a decision based on hunger
+    MapTile[] foodspots = RejectLockedOutTilesFromTiles(currentTile.NeighboringTilesOfType(MapTileType.Food));
+    if (foodspots.Length > 0 && Random.value < hunger) {
+      MoveToTile(foodspots[0]);
+      return;
+    }
+
     if (Random.value < freeWill) {
       // Make a crazy decision
       MapTile[] rejectedNearby = RejectPreviousTiles(nearby);
@@ -119,9 +132,7 @@ public class Agent : MonoBehaviour {
       return;
 
     if (currentTile.type == MapTileType.Food) {
-      energy += 0.5F;
-      if (energy > 1)
-        energy = 1;
+      EatFoodTile();
     }
     else if (currentTile.type == MapTileType.End) {
       Finish();
@@ -130,13 +141,47 @@ public class Agent : MonoBehaviour {
     UpdateAI();
   }
 
-  public MapTile[] RejectPreviousTiles(MapTile[] tiles) {
+  void EatFoodTile() {
+    if (!IsLockedOutOfTile(currentTile)) {
+      energy += 0.5F;
+      if (energy > 1)
+        energy = 1;
+    }
+    LockOutTile(currentTile);
+  }
+
+  MapTile[] RejectPreviousTiles(MapTile[] tiles) {
     ArrayList neighborList = new ArrayList();
     foreach (MapTile tile in tiles) {
         if (tile != previousTile)
             neighborList.Add(tile);
     }
     return neighborList.ToArray( typeof( MapTile ) ) as MapTile[];
+  }
+
+  ArrayList lockedOutTiles;
+  MapTile[] RejectLockedOutTilesFromTiles(MapTile[] tiles) {
+    if (lockedOutTiles == null)
+      return tiles;
+    ArrayList neighborList = new ArrayList();
+    foreach (MapTile tile in tiles) {
+        if (!IsLockedOutOfTile(tile))
+            neighborList.Add(tile);
+    }
+    return neighborList.ToArray( typeof( MapTile ) ) as MapTile[];
+  }
+
+  bool IsLockedOutOfTile(MapTile tile) {
+    if (lockedOutTiles == null)
+      return false;
+    return lockedOutTiles.IndexOf(tile) != -1;
+  }
+
+  void LockOutTile(MapTile tile) {
+    if (lockedOutTiles == null) {
+      lockedOutTiles = new ArrayList();
+    }
+    lockedOutTiles.Add(tile);
   }
 
   void MoveToTile(MapTile tile) {
@@ -193,7 +238,10 @@ public class Agent : MonoBehaviour {
   }
 
   public float Fitness() {
-    return DistanceToGoal();
+    float fitness = DistanceToGoal();
+    if (finished)
+      fitness *= 2;
+    return fitness;
   }
 
   public float Lifetime() {
