@@ -69,6 +69,7 @@ public class AgentManager : MonoBehaviour {
 
     }
 
+    CalculateAverages();
   }
 
   public void OnAgentFinish(Agent finishedAgent) {
@@ -112,6 +113,33 @@ public class AgentManager : MonoBehaviour {
     Generate(fittest);
   }
 
+
+  float previousSpeed;
+  float currentSpeed;
+
+  float previousFreeWill;
+  float currentFreeWill;
+
+  float previousHunger;
+  float currentHunger;
+
+  void CalculateAverages() {
+    previousSpeed = currentSpeed;
+    currentSpeed = 0;
+    previousFreeWill = currentFreeWill;
+    currentFreeWill = 0;
+    previousHunger = currentHunger;
+    currentHunger = 0;
+    foreach(Agent agent in currentAgents) {
+      currentSpeed += agent.speed;
+      currentFreeWill += agent.freeWill;
+      currentHunger += agent.hunger;
+    }
+    currentSpeed = currentSpeed / agentsPerGeneration;
+    currentFreeWill = currentFreeWill / agentsPerGeneration;
+    currentHunger = currentHunger / agentsPerGeneration;
+  }
+
   void OnGUI(){
     GUILayout.BeginHorizontal ("box");
     GUILayout.Label("Generation " + generation);
@@ -119,6 +147,24 @@ public class AgentManager : MonoBehaviour {
     GUILayout.Label(" | Finished: " + finishedAgents + " (" + DeltaString(finishedAgents - previousFinished) + ")");
     GUILayout.Label(" | Dead: " + deadAgents);
     GUILayout.EndHorizontal ();
+
+    GUILayout.BeginVertical ("box");
+    GUILayout.Label("Averages:");
+    GUILayout.Label("Speed: " + currentSpeed + " (" + DeltaString(currentSpeed - previousSpeed) + ")");
+    GUILayout.Label("Free Will: " + currentFreeWill + " (" + DeltaString(currentFreeWill - previousFreeWill) + ")");
+    GUILayout.Label("Hunger: " + currentHunger + " (" + DeltaString(currentHunger - previousHunger) + ")");
+    GUILayout.EndVertical ();
+
+    if (GUILayout.Button("Restart")) {
+      Application.LoadLevel ("main");
+    }
+  }
+
+    System.String DeltaString(float delta) {
+    if (delta > 0) {
+      return "+" + delta;
+    }
+    return "" + delta;
   }
 
   System.String DeltaString(int delta) {

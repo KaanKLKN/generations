@@ -39,10 +39,10 @@ public class Map : MonoBehaviour {
     }
 
     // Add a start tile
-    tileTypes[Random.Range(0, size), Random.Range(0, size)] = MapTileType.Start;
+    tileTypes[Random.Range(0, size / 4), Random.Range(0, size)] = MapTileType.Start;
 
     // Add an end tile
-    tileTypes[Random.Range(0, size), Random.Range(0, size)] = MapTileType.End;
+    tileTypes[Random.Range(size - size / 4, size), Random.Range(0, size)] = MapTileType.End;
 
     return tileTypes;
   }

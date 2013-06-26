@@ -240,7 +240,7 @@ public class Agent : MonoBehaviour {
   public float Fitness() {
     float fitness = DistanceToGoal();
     if (finished)
-      fitness *= 2;
+      fitness = - 1000;
     return fitness;
   }
 
