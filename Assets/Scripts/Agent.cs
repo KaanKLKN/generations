@@ -123,7 +123,7 @@ public class Agent : MonoBehaviour {
     }
 
     // Decision cost
-    energy -= 0.05F;
+    //energy -= 0.05F;
 
   }
 
@@ -197,7 +197,7 @@ public class Agent : MonoBehaviour {
   }
 
   float EnergyUsageRate() {
-    float rate = 0.01F; // Lifespan
+    float rate = 0.02F; // Lifespan
     rate += NormalizedSpeed() / 20; // Faster guys use more energy
     return rate;
   }
@@ -207,7 +207,7 @@ public class Agent : MonoBehaviour {
     if (!dead && !finished) {
 
       // Reduce energy for lifespan
-      energy -= Time.deltaTime * 0.02F;
+      energy -= Time.deltaTime * EnergyUsageRate();
 
       SetColorToHealth();
 
