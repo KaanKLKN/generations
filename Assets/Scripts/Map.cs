@@ -18,47 +18,36 @@ public class Map : MonoBehaviour {
   }
 
   MapTileType[,] GenerateRandomMapTileTypes () {
-    MapTileType[,] tiles = new MapTileType[size, size];
-    bool startTileUsed = false;
-    bool endTileUsed = false;
+    MapTileType[,] tileTypes = new MapTileType[size, size];
     for (int i=0; i < size; i++) {
        for (int j=0; j < size; j++){
 
-        int random = Random.Range(0, 4);
+        float val = Random.value;
         MapTileType type = MapTileType.Free;
-        switch (random) {
-           case 0:
-              type = MapTileType.Free;
-              break;
-           case 1:
-              type = MapTileType.Blocked;
-              break;
-           case 2:
-              if (!startTileUsed) {
-                type = MapTileType.Start;
-                startTileUsed = true;
-              }
-              break;
-           case 3:
-              if (!endTileUsed) {
-                type = MapTileType.End;
-                endTileUsed = true;
-              }
-              break;
+
+        if (val < 0.25) {
+          type = MapTileType.Blocked;
         }
 
-        tiles[i,j] = type;
+        tileTypes[i,j] = type;
 
        }
     }
-    return tiles;
+
+    // Add a start tile
+    tileTypes[Random.Range(0, size), Random.Range(0, size)] = MapTileType.Start;
+
+    // Add an end tile
+    tileTypes[Random.Range(0, size), Random.Range(0, size)] = MapTileType.End;
+
+    return tileTypes;
   }
 
-  Vector3 PositionForTileAtIndices(int i, int j) {
-    return new Vector3(i * TileSize(), 0, j * TileSize());
-  }
+  MapTile[,] tiles;
 
   void BuildTiles(MapTileType[,] map) {
+    tiles = new MapTile[size, size];
+
     for (int i=0; i < size; i++) {
        for (int j=0; j < size; j++){
 
@@ -80,7 +69,7 @@ public class Map : MonoBehaviour {
         }
 
 
-        GameObject tileObject = Instantiate(prefab, PositionForTileAtIndices(i, j), Quaternion.identity) as GameObject;
+        GameObject tileObject = Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
         tileObject.name = "Tile (" + i + ", " + j + ")";
         tileObject.transform.parent = this.transform;
 
@@ -88,6 +77,8 @@ public class Map : MonoBehaviour {
         tile.map = this;
         tile.type = type;
         tile.point = new MapPoint(i, j);
+
+        tiles[i, j] = tile;
 
         if (type == MapTileType.Start) {
           startTile = tile;
@@ -98,6 +89,12 @@ public class Map : MonoBehaviour {
 
        }
     }
+  }
+
+  public MapTile MapTileAtPoint(MapPoint point) {
+    if (point.x < 0 || point.y < 0 || point.x >= size || point.y >= size)
+      return null;
+    return tiles[point.x, point.y];
   }
 
   public Vector3 Origin () {
@@ -111,7 +108,7 @@ public class Map : MonoBehaviour {
   }
   
   public float TileSize () {
-      return 10;
+      return 1;
   }
 
   public Bounds Bounds(){

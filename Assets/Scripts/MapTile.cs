@@ -8,18 +8,75 @@ public enum MapTileType {
   Blocked
 }
 
+public enum CardinalDirection {
+  North,
+  South,
+  East,
+  West
+}
+
 public class MapTile : MonoBehaviour {
 
   public MapTileType type;
   public MapPoint point;
   public Map map;
 
+  void Start() {
+    transform.position = Center();
+
+    if (type == MapTileType.Blocked) {
+      transform.localScale = new Vector3(1F, 1.5F, 1F);
+    }
+  }
+
   public Vector3 Origin() {
-    return new Vector3(point.x * map.TileSize(), 0, point.y * map.TileSize());
+    return map.transform.position + new Vector3(point.x * map.TileSize(), 0, point.y * map.TileSize());
   }
 
   public Vector3 Center() {
-    return Origin() + new Vector3(map.TileSize() / 2, 0, map.TileSize() / 2);
+    return Origin() + new Vector3(Radius(), 0, Radius());
   }
 
+  public Vector3 CenterTop() {
+    return Center() + new Vector3(0, Radius(), 0);
+  }
+
+  public float Radius() {
+    return map.TileSize() / 2;
+  }
+
+  public Vector3 RandomTop() {
+    return CenterTop() + new Vector3(Random.Range(-Radius(), Radius()), 0, Random.Range(-Radius(), Radius()));
+  }
+
+  public MapTile NeighboringTileInDirection(CardinalDirection direction) {
+    return map.MapTileAtPoint(point.NearestMapPointInDirection(direction));
+  }
+
+  public MapTile[] NeighboringTiles() {
+    ArrayList neighborList = new ArrayList();
+    foreach (CardinalDirection direction in new ArrayList{CardinalDirection.North, CardinalDirection.South, CardinalDirection.West, CardinalDirection.East}) {
+      MapTile tile = NeighboringTileInDirection(direction);
+      if (tile)
+        neighborList.Add(tile);
+    }
+    return neighborList.ToArray( typeof( MapTile ) ) as MapTile[];
+  }
+
+  public MapTile[] NeighboringTilesOfType(MapTileType type) {
+    ArrayList neighborList = new ArrayList();
+    foreach (MapTile tile in NeighboringTiles()) {
+        if (tile.type == type)
+            neighborList.Add(tile);
+    }
+    return neighborList.ToArray( typeof( MapTile ) ) as MapTile[];
+  }
+
+  void OnDrawGizmosSelected() {
+    Gizmos.color = Color.red;
+    Gizmos.DrawWireCube(Origin(), new Vector3(1, 1, 1));
+
+    Gizmos.color = Color.green;
+    Gizmos.DrawWireCube(Center(), new Vector3(1, 1, 1));
+  }
 }
