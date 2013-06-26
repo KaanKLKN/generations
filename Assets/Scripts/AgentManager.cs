@@ -26,9 +26,15 @@ public class AgentManager : MonoBehaviour {
     // Build the agents
     Generate(null);
   }
+
+  int previousDead;
+  int previousFinished;
   
   void Generate(Agent[] previousAgents) {
     generation++;
+
+    previousDead = deadAgents;
+    previousFinished = finishedAgents;
 
     // Build agents if we don't have any.
 
@@ -79,6 +85,10 @@ public class AgentManager : MonoBehaviour {
     return agentsPerGeneration - deadAgents - finishedAgents;
   }
 
+  int PreviousLivingAgents() {
+    return agentsPerGeneration - previousDead - previousFinished;
+  }
+
   void CheckGenerationComplete() {
     if (LivingAgents() <= 0) {
       StartCoroutine(SelectFittestAndBeginNewGeneration());
@@ -103,10 +113,19 @@ public class AgentManager : MonoBehaviour {
   }
 
   void OnGUI(){
-    GUILayout.Label("Generation: " + generation);
-    GUILayout.Label("Living agents: " + LivingAgents());
-    GUILayout.Label("Finished: " + finishedAgents);
-    GUILayout.Label("Dead: " + deadAgents);
+    GUILayout.BeginHorizontal ("box");
+    GUILayout.Label("Generation " + generation);
+    GUILayout.Label(" | Living: " + LivingAgents());
+    GUILayout.Label(" | Finished: " + finishedAgents + " (" + DeltaString(finishedAgents - previousFinished) + ")");
+    GUILayout.Label(" | Dead: " + deadAgents);
+    GUILayout.EndHorizontal ();
+  }
+
+  System.String DeltaString(int delta) {
+    if (delta > 0) {
+      return "+" + delta;
+    }
+    return "" + delta;
   }
   
 }
