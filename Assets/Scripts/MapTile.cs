@@ -5,6 +5,7 @@ public enum MapTileType {
   Start,
   End,
   Free,
+  Food,
   Blocked
 }
 
@@ -63,6 +64,15 @@ public class MapTile : MonoBehaviour {
     return neighborList.ToArray( typeof( MapTile ) ) as MapTile[];
   }
 
+  public MapTile[] PassableNeighboringTiles() {
+    ArrayList neighborList = new ArrayList();
+    foreach (MapTile tile in NeighboringTiles()) {
+        if (tile.type != MapTileType.Blocked)
+            neighborList.Add(tile);
+    }
+    return neighborList.ToArray( typeof( MapTile ) ) as MapTile[];
+  }
+
   public MapTile[] NeighboringTilesOfType(MapTileType type) {
     ArrayList neighborList = new ArrayList();
     foreach (MapTile tile in NeighboringTiles()) {
@@ -72,11 +82,4 @@ public class MapTile : MonoBehaviour {
     return neighborList.ToArray( typeof( MapTile ) ) as MapTile[];
   }
 
-  void OnDrawGizmosSelected() {
-    Gizmos.color = Color.red;
-    Gizmos.DrawWireCube(Origin(), new Vector3(1, 1, 1));
-
-    Gizmos.color = Color.green;
-    Gizmos.DrawWireCube(Center(), new Vector3(1, 1, 1));
-  }
 }

@@ -31,5 +31,11 @@ public class MapPoint  {
           return new MapPoint(x - distance, y);
     }
   }
-    
+  
+  public float DistanceFromMapPoint(MapPoint otherPoint) {
+    float dx = otherPoint.x - x;
+    float dy = otherPoint.y - y;
+    return Mathf.Sqrt(Mathf.Pow(dx, 2) + Mathf.Pow(dy, 2));
+  }
+
 }

@@ -9,6 +9,7 @@ public class Map : MonoBehaviour {
   public GameObject endTilePrefab;
   public GameObject freeTilePrefab;
   public GameObject blockedTilePrefab;
+  public GameObject foodTilePrefab;
 
   public MapTile startTile;
   public MapTile endTile;
@@ -27,6 +28,9 @@ public class Map : MonoBehaviour {
 
         if (val < 0.25) {
           type = MapTileType.Blocked;
+        }
+        else if (val > 0.25 && val < 0.28) {
+          type = MapTileType.Food;
         }
 
         tileTypes[i,j] = type;
@@ -65,6 +69,9 @@ public class Map : MonoBehaviour {
               break;
            case MapTileType.Start:
               prefab = startTilePrefab;
+              break;
+           case MapTileType.Food:
+              prefab = foodTilePrefab;
               break;
         }
 
