@@ -7,8 +7,11 @@ public class Agent : MonoBehaviour {
 
   public float speed;
   public float freeWill;
-  public float energy;
+  public float hunger;
   public float startingEnergy;
+
+  public float energy;
+
 
   public MapTile currentTile;
   public MapTile previousTile;
@@ -24,6 +27,7 @@ public class Agent : MonoBehaviour {
     speed = Random.Range(0.1F, 1F);
     startingEnergy = Random.Range(0.5F, 1F);
     freeWill = Random.Range(0F, 1F);
+    hunger = Random.Range(0F, 1F);
 
     FinishCreating();
   }
@@ -33,6 +37,7 @@ public class Agent : MonoBehaviour {
     speed = RandomParent(parents).speed;
     startingEnergy = RandomParent(parents).startingEnergy;
     freeWill = RandomParent(parents).freeWill;
+    hunger = RandomParent(parents).hunger;
 
     if (Random.value < 0.05) {
       speed = Random.Range(0.1F, 1F);
@@ -42,6 +47,9 @@ public class Agent : MonoBehaviour {
     }
     if (Random.value < 0.05) {
       freeWill = Random.Range(0F, 1F);
+    }
+    if (Random.value < 0.05) {
+      hunger = Random.Range(0F, 1F);
     }
 
     FinishCreating();
