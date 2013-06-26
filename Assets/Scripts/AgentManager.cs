@@ -9,7 +9,8 @@ public class AgentManager : MonoBehaviour {
   public int agentsPerGeneration = 50;
   public GameObject agentPrefab;
 
-  int livingAgents;
+  int deadAgents;
+  int finishedAgents;
   int generation;
 
   public Agent[] currentAgents;
@@ -17,7 +18,7 @@ public class AgentManager : MonoBehaviour {
   void Start () {
 
     generation = 0;
-    livingAgents = 0;
+    currentAgents = new Agent[agentsPerGeneration];
 
     // Build the map
     map.Generate();
@@ -29,14 +30,17 @@ public class AgentManager : MonoBehaviour {
   void Generate(Agent[] previousAgents) {
     generation++;
 
+    // Build agents if we don't have any.
+
     foreach (Transform child in transform) {
       Destroy(child.gameObject);
     }
 
-    currentAgents = new Agent[agentsPerGeneration];
+    deadAgents = 0;
+    finishedAgents = 0;
 
     for (int i=0; i < agentsPerGeneration; i++) {
-
+      
         GameObject agentObject = Instantiate(agentPrefab, Vector3.zero, Quaternion.identity) as GameObject;
         agentObject.name = "Agent " + i;
         agentObject.transform.parent = this.transform;
@@ -59,14 +63,24 @@ public class AgentManager : MonoBehaviour {
 
     }
 
-    livingAgents = agentsPerGeneration;
+  }
 
+  public void OnAgentFinish(Agent finishedAgent) {
+    finishedAgents += 1;
+    CheckGenerationComplete();
   }
 
   public void OnAgentDeath(Agent deadAgent) {
-    livingAgents -= 1;
+    deadAgents += 1;
+    CheckGenerationComplete();
+  }
 
-    if (livingAgents <= 0) {
+  int LivingAgents() {
+    return agentsPerGeneration - deadAgents - finishedAgents;
+  }
+
+  void CheckGenerationComplete() {
+    if (LivingAgents() <= 0) {
       StartCoroutine(SelectFittestAndBeginNewGeneration());
     }
   }
@@ -90,7 +104,9 @@ public class AgentManager : MonoBehaviour {
 
   void OnGUI(){
     GUILayout.Label("Generation: " + generation);
-    GUILayout.Label("Living agents: " + livingAgents);
+    GUILayout.Label("Living agents: " + LivingAgents());
+    GUILayout.Label("Finished: " + finishedAgents);
+    GUILayout.Label("Dead: " + deadAgents);
   }
   
 }

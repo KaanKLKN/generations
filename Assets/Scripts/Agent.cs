@@ -1,9 +1,12 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public class Agent : MonoBehaviour {
 
   public float speed;
+  public float freeWill;
   public float energy;
   public float startingEnergy;
 
@@ -13,13 +16,14 @@ public class Agent : MonoBehaviour {
   public AgentManager manager;
 
   public bool dead;
+  public bool finished;
   public float birthTime;
   public float deathTime;
 
   public void CreateRandom() {
     speed = Random.Range(0.1F, 1F);
-    energy = Random.Range(0.1F, 1F);
-    dead = false;
+    startingEnergy = Random.Range(0.5F, 1F);
+    freeWill = Random.Range(0F, 1F);
 
     FinishCreating();
   }
@@ -27,13 +31,17 @@ public class Agent : MonoBehaviour {
   public void CreateFromParents(Agent[] parents) {
 
     speed = RandomParent(parents).speed;
-    energy = RandomParent(parents).startingEnergy;
+    startingEnergy = RandomParent(parents).startingEnergy;
+    freeWill = RandomParent(parents).freeWill;
 
     if (Random.value < 0.05) {
       speed = Random.Range(0.1F, 1F);
     }
     if (Random.value < 0.05) {
-      energy = Random.Range(0.1F, 1F);
+      startingEnergy = Random.Range(0.1F, 1F);
+    }
+    if (Random.value < 0.05) {
+      freeWill = Random.Range(0F, 1F);
     }
 
     FinishCreating();
@@ -44,7 +52,9 @@ public class Agent : MonoBehaviour {
   }
 
   void FinishCreating() {
-    startingEnergy = energy;
+    dead = false;
+    finished = false;
+    energy = startingEnergy;
     SetColor(renderer.material.color);
     transform.position = currentTile.CenterTop();
     transform.localScale = transform.localScale + new Vector3(0, Random.Range(-0.1F, 0.1F), 0);
@@ -62,29 +72,51 @@ public class Agent : MonoBehaviour {
   }
     
   void UpdateAI() {
-    if (dead)
+    if (dead || finished)
       return;
 
     // Move to a random available tile
+
     MapTile[] nearby = currentTile.PassableNeighboringTiles();
     if (nearby.Length == 1) {
       MoveToTile(nearby[0]);
+      return;
     }
-    else if (nearby.Length > 1) {
+
+    MapTile[] exits = currentTile.NeighboringTilesOfType(MapTileType.End);
+    if (exits.Length > 0) {
+      MoveToTile(exits[0]);
+      return;
+    }
+
+    if (Random.value < freeWill) {
+      // Make a crazy decision
       MapTile[] rejectedNearby = RejectPreviousTiles(nearby);
       MapTile randomTile = rejectedNearby[Random.Range(0, rejectedNearby.Length)];
       MoveToTile(randomTile);
     }
+    else {
+      // Fit in
+      MapTile[] inDirection = RejectPreviousTiles(currentTile.NeighboringTilesClosestTo(manager.map.endTile));
+      MoveToTile(inDirection[0]);
+    }
+
+    // Decision cost
+    energy -= 0.05F;
+
   }
 
   void MoveToTileComplete() {
-    if (dead)
+    if (dead || finished)
       return;
 
     if (currentTile.type == MapTileType.Food) {
       energy += 0.5F;
       if (energy > 1)
         energy = 1;
+    }
+    else if (currentTile.type == MapTileType.End) {
+      Finish();
     }
 
     UpdateAI();
@@ -113,14 +145,16 @@ public class Agent : MonoBehaviour {
 
   float EnergyUsageRate() {
     float rate = 0.01F; // Lifespan
-    rate += NormalizedSpeed() / 10; // Faster guys use more energy
+    rate += NormalizedSpeed() / 20; // Faster guys use more energy
     return rate;
   }
 
   void Update() {
 
-    if (!dead) {
-      energy -= Time.deltaTime * EnergyUsageRate();
+    if (!dead && !finished) {
+
+      // Reduce energy for lifespan
+      energy -= Time.deltaTime * 0.02F;
 
       SetColorToHealth();
 
@@ -140,6 +174,14 @@ public class Agent : MonoBehaviour {
     SetColor(Color.black);
     fitness = Fitness();
     manager.OnAgentDeath(this);
+  }
+
+  void Finish() {
+    finished = true;
+    iTween.Stop(gameObject);
+    fitness = Fitness();
+    SetColor(Color.magenta);
+    manager.OnAgentFinish(this);
   }
 
   public float Fitness() {

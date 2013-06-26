@@ -15,7 +15,7 @@ public class MapPoint  {
   public MapPoint NearestMapPointInDirection(CardinalDirection direction) {
     return MapPointInDirectionAtDistance(direction, 1);
   }
-  
+
   public MapPoint MapPointInDirectionAtDistance(CardinalDirection direction, int distance) {
     switch (direction){
       case CardinalDirection.North:
@@ -37,5 +37,27 @@ public class MapPoint  {
     float dy = otherPoint.y - y;
     return Mathf.Sqrt(Mathf.Pow(dx, 2) + Mathf.Pow(dy, 2));
   }
+
+  public CardinalDirection DirectionToMapPoint(MapPoint otherPoint) {
+      
+    if (otherPoint.x > x) {
+      return CardinalDirection.East;
+    }
+    
+    if (otherPoint.x < x) {
+      return CardinalDirection.West;
+    }
+    
+    if (otherPoint.y > y) {
+      return CardinalDirection.North;
+    }
+    
+    if (otherPoint.y < y) {
+      return CardinalDirection.South;
+    }
+    
+    return CardinalDirection.North;
+  }
+
 
 }

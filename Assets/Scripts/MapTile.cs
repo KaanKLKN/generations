@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public enum MapTileType {
   Start,
@@ -52,6 +54,12 @@ public class MapTile : MonoBehaviour {
 
   public MapTile NeighboringTileInDirection(CardinalDirection direction) {
     return map.MapTileAtPoint(point.NearestMapPointInDirection(direction));
+  }
+
+  public MapTile[] NeighboringTilesClosestTo(MapTile otherTile) {
+    List<MapTile> list = new List<MapTile>();
+    list.AddRange(PassableNeighboringTiles());
+    return list.OrderBy(a => a.point.DistanceFromMapPoint(otherTile.point)).ToArray();
   }
 
   public MapTile[] NeighboringTiles() {
