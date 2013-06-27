@@ -96,7 +96,7 @@ public class MapTile : MonoBehaviour {
   public MapTile[] PassableNeighboringTilesForAgent(Agent agent) {
     ArrayList neighborList = new ArrayList();
     foreach (MapTile tile in NeighboringTiles()) {
-        if (tile.PassableFromTileForAgent(tile, agent))
+        if (tile != null && PassableFromTileForAgent(tile, agent))
             neighborList.Add(tile);
     }
     return neighborList.ToArray( typeof( MapTile ) ) as MapTile[];
@@ -139,8 +139,21 @@ public class MapTile : MonoBehaviour {
   // Passability
 
   public bool PassableFromTileForAgent(MapTile destinationTile, Agent agent) {
-    float heightDifference = Mathf.Abs(destinationTile.height - height);
-    return heightDifference < 0.2;
+    float heightDifference = Mathf.Abs(height - destinationTile.height);
+    return heightDifference < 0.25;
+  }
+
+  public void DrawSelectedGizmo() {
+    Gizmos.DrawWireCube (transform.position, transform.localScale);
+  }
+
+  void OnDrawGizmosSelected() {
+    Gizmos.color = Color.red;
+    DrawSelectedGizmo();
+    Gizmos.color = Color.green;
+    foreach (MapTile passableNeighbor in PassableNeighboringTilesForAgent(null)) {
+      passableNeighbor.DrawSelectedGizmo();
+    }
   }
 
   // Appearance
