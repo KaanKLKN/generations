@@ -33,6 +33,8 @@ public class MapTile : MonoBehaviour {
     if (map != null)
       transform.position = Center();
 
+    here = new ArrayList();
+
     transform.localScale = new Vector3(1F, height * 3, 1F);
   }
 
@@ -102,6 +104,27 @@ public class MapTile : MonoBehaviour {
             neighborList.Add(tile);
     }
     return neighborList.ToArray( typeof( MapTile ) ) as MapTile[];
+  }
+
+  // Presence
+
+  ArrayList here;
+
+  public void AgentDidEnter(Agent agent) {
+    here.Add(agent);
+  }
+
+  public void AgentDidExit(Agent agent) {
+    here.Remove(agent);
+  }
+
+  public Agent[] AgentsHereExcluding(Agent excludedAgent) {
+    ArrayList others = new ArrayList();
+    foreach (Agent otherAgent in here) {
+        if (otherAgent != excludedAgent)
+            others.Add(otherAgent);
+    }
+    return others.ToArray( typeof( Agent ) ) as Agent[];
   }
 
 }

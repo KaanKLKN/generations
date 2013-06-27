@@ -266,4 +266,18 @@ public class Agent : MonoBehaviour {
     return speed * 16;
   }
 
+  // Reproduction
+
+  float reproductionCost = 0.25F;
+
+  public bool CanReproduce() {
+    if (energy > reproductionCost) {
+      Agent[] otherAgents = currentTile.AgentsHereExcluding(this);
+      if (otherAgents.Length > 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 }
