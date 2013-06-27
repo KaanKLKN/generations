@@ -112,7 +112,13 @@ public class Agent : MonoBehaviour {
       }
     recoloredMaterial.color = color;
   }
-    
+  
+
+  void Notify(AgentNotificationType type) {
+    GetComponent<AgentNotifier>().Notify(type);
+  }
+
+
   void UpdateAI() {
     if (dead || finished)
       return;
@@ -276,6 +282,9 @@ public class Agent : MonoBehaviour {
 
       //SetColorToHealth();
 
+      if (manager ==null)
+        return;
+
       if (energy <= 0F) {
         manager.IncrementCounter("Died", 1);
         manager.IncrementCounter("Died of Starvation", 1);
@@ -395,6 +404,7 @@ public class Agent : MonoBehaviour {
     child.energy = reproductionThreshold;
 
     manager.IncrementCounter("Reproduced", 1);
+    Notify(AgentNotificationType.Sex);
 
     return child;
   }
