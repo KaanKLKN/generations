@@ -34,8 +34,8 @@ public class MapTile : MonoBehaviour {
     if (map != null)
       transform.position = Center();
 
-    transform.localScale = new Vector3(1F, height * 4, 1F);
-
+    transform.localScale = new Vector3(1F, height * map.maxElevation, 1F);
+    transform.localPosition = transform.localPosition + new Vector3(0, height * map.maxElevation / 2, 0);
     SetColorForHeight();
   }
 
@@ -44,7 +44,8 @@ public class MapTile : MonoBehaviour {
   }
 
   public Vector3 Origin() {
-    return map.transform.position + new Vector3(point.x * map.TileSize(), 0, point.y * map.TileSize());
+    float tileSizeWithSqueeze = map.tileSize + map.tilePadding;
+    return map.transform.position + new Vector3(point.x * tileSizeWithSqueeze, 0, point.y * tileSizeWithSqueeze);
   }
 
   public Vector3 Center() {
@@ -52,12 +53,11 @@ public class MapTile : MonoBehaviour {
   }
 
   public Vector3 CenterTop() {
-    float height = ((BoxCollider)(collider)).size.y * transform.localScale.y;
-    return Center() + new Vector3(0, height / 2, 0);
+    return Center() + new Vector3(0, transform.localScale.y, 0);
   }
 
   public float Radius() {
-    return map.TileSize() / 2;
+    return map.tileSize / 2;
   }
 
   public Vector3 RandomTop() {

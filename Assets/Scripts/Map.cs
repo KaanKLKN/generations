@@ -4,6 +4,9 @@ using System.Collections;
 public class Map : MonoBehaviour {
 
   public int size = 64;
+  public float tilePadding = 0.5F;
+  public float tileSize = 1;
+  public float maxElevation = 4;
 
   public GameObject startTilePrefab;
   public GameObject endTilePrefab;
@@ -11,10 +14,17 @@ public class Map : MonoBehaviour {
   public GameObject blockedTilePrefab;
   public GameObject foodTilePrefab;
 
+  [HideInInspector]
   public MapTile startTile;
+  [HideInInspector]
   public MapTile endTile;
 
-  public void Generate () {
+  public MapMesh mapMesh;
+
+  void Awake() {
+  }
+
+  public void Generate() {
     BuildTiles(GenerateRandomMapTileTypes());
   }
 
@@ -98,6 +108,9 @@ public class Map : MonoBehaviour {
 
        }
     }
+
+    //mapMesh.GenerateFromTiles(tiles);
+
   }
 
   public MapTile RandomTile() {
@@ -115,18 +128,14 @@ public class Map : MonoBehaviour {
   }
   
   public Vector3 Center() {
-      float absoluteX  = size  * TileSize();
-      float absoluteZ = size   * TileSize();
+      float absoluteX  = size  * tileSize;
+      float absoluteZ = size   * tileSize;
       return Origin() + new Vector3(absoluteX / 2, 0, absoluteZ / 2);
   }
   
-  public float TileSize () {
-      return 1;
-  }
-
   public Bounds Bounds(){
-      float absoluteWidth  = size  * TileSize();
-      float absoluteHeight = size  * TileSize();
+      float absoluteWidth  = size  * tileSize;
+      float absoluteHeight = size  * tileSize;
       return new Bounds(Center(), new Vector3(absoluteWidth, 1000, absoluteHeight));
   }
 
