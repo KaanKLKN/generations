@@ -106,8 +106,11 @@ public class Agent : MonoBehaviour {
     // Make a decision based on hunger
     MapTile[] foodspots = RejectLockedOutTilesFromTiles(currentTile.NeighboringTilesOfType(MapTileType.Food));
     if (foodspots.Length > 0 && Random.value < hunger) {
-      MoveToTile(foodspots[0]);
-      return;
+      FoodTile foodTile = foodspots[0] as FoodTile;
+      if (foodTile.CanConsumeFood(this)) {
+        MoveToTile(foodspots[0]);
+        return;
+      }
     }
 
     if (Random.value < freeWill) {
@@ -118,13 +121,23 @@ public class Agent : MonoBehaviour {
     }
     else {
       // Fit in
-      MapTile[] inDirection = RejectPreviousTiles(currentTile.NeighboringTilesClosestTo(manager.map.endTile));
-      MoveToTile(inDirection[0]);
+      //MapTile[] inDirection = RejectPreviousTiles(currentTile.NeighboringTilesClosestTo(manager.map.endTile));
+      MapTile forwardTile = currentTile.NeighboringTileInDirection(CurrentDirection());
+      if (forwardTile != null)
+        MoveToTile(forwardTile);
+      else
+        MoveToTile(nearby[0]);
     }
 
     // Decision cost
     //energy -= 0.05F;
 
+  }
+
+  CardinalDirection CurrentDirection() {
+    if (previousTile == null)
+      return CardinalDirection.North;
+    return previousTile.point.DirectionToMapPoint(currentTile.point);
   }
 
   void MoveToTileComplete() {
@@ -142,12 +155,12 @@ public class Agent : MonoBehaviour {
   }
 
   void EatFoodTile() {
-    if (!IsLockedOutOfTile(currentTile)) {
-      energy += 0.5F;
+    FoodTile food = currentTile as FoodTile;
+    if (food.ConsumeFood(this)) {
+      energy += food.foodEnergy;
       if (energy > 1)
         energy = 1;
     }
-    LockOutTile(currentTile);
   }
 
   MapTile[] RejectPreviousTiles(MapTile[] tiles) {
@@ -238,10 +251,7 @@ public class Agent : MonoBehaviour {
   }
 
   public float Fitness() {
-    float fitness = DistanceToGoal();
-    if (finished)
-      fitness = - 1000;
-    return fitness;
+    return 1 / Lifetime();
   }
 
   public float Lifetime() {

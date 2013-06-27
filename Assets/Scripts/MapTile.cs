@@ -29,7 +29,7 @@ public class MapTile : MonoBehaviour {
   public Map map;
   public float height;
 
-  void Start() {
+  public virtual void Start() {
     if (map != null)
       transform.position = Center();
 

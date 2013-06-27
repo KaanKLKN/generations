@@ -52,7 +52,7 @@ public class AgentManager : MonoBehaviour {
         agentObject.transform.parent = this.transform;
 
         Agent agent = agentObject.GetComponent<Agent>();
-        agent.currentTile = map.startTile;
+        agent.currentTile = map.RandomTile();
         agent.manager = this;
 
         if (generation < 2) {

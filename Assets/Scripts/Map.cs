@@ -39,10 +39,10 @@ public class Map : MonoBehaviour {
     }
 
     // Add a start tile
-    tileTypes[Random.Range(0, size / 4), Random.Range(0, size)] = MapTileType.Start;
+    //tileTypes[Random.Range(0, size / 4), Random.Range(0, size)] = MapTileType.Start;
 
     // Add an end tile
-    tileTypes[Random.Range(size - size / 4, size), Random.Range(0, size)] = MapTileType.End;
+    //tileTypes[Random.Range(size - size / 4, size), Random.Range(0, size)] = MapTileType.End;
 
     return tileTypes;
   }
@@ -53,6 +53,7 @@ public class Map : MonoBehaviour {
     tiles = new MapTile[size, size];
 
     double[,] tileHeightmap = new PlasmaFractalGenerator().Generate(size, size, 50);
+    double[,] tileColormap = new PlasmaFractalGenerator().Generate(size, size, 50);
 
     for (int i=0; i < size; i++) {
        for (int j=0; j < size; j++){
@@ -82,7 +83,7 @@ public class Map : MonoBehaviour {
         tileObject.name = "Tile (" + i + ", " + j + ")";
         tileObject.transform.parent = this.transform;
 
-        MapTile tile = tileObject.GetComponent<MapTile>();
+        MapTile tile = tileObject.gameObject.GetComponent<MapTile>();
         tile.map = this;
         tile.type = type;
         tile.point = new MapPoint(i, j);
@@ -99,6 +100,10 @@ public class Map : MonoBehaviour {
 
        }
     }
+  }
+
+  public MapTile RandomTile() {
+    return tiles[Random.Range(0, size), Random.Range(0, size)];
   }
 
   public MapTile MapTileAtPoint(MapPoint point) {
