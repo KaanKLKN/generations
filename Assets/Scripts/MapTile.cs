@@ -33,8 +33,6 @@ public class MapTile : MonoBehaviour {
     if (map != null)
       transform.position = Center();
 
-    here = new ArrayList();
-
     transform.localScale = new Vector3(1F, height * 3, 1F);
   }
 
@@ -111,10 +109,14 @@ public class MapTile : MonoBehaviour {
   ArrayList here;
 
   public void AgentDidEnter(Agent agent) {
+    if (here == null)
+        here = new ArrayList();
     here.Add(agent);
   }
 
   public void AgentDidExit(Agent agent) {
+    if (here == null)
+        here = new ArrayList();
     here.Remove(agent);
   }
 
