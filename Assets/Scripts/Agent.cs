@@ -10,8 +10,10 @@ public class Agent : MonoBehaviour {
   public float hunger;
   public float vision;
   public float startingEnergy;
+  public float lifespan;
 
   public float energy;
+  public float lifeRemaining;
 
 
   public MapTile currentTile;
@@ -27,6 +29,7 @@ public class Agent : MonoBehaviour {
   public void CreateRandom() {
     speed = Random.Range(0.1F, 1F);
     startingEnergy = Random.Range(0.5F, 1F);
+    lifespan = Random.Range(1F, 20F);
     freeWill = Random.Range(0F, 1F);
     hunger = Random.Range(0F, 1F);
     vision = Random.Range(0, 10);
@@ -41,12 +44,16 @@ public class Agent : MonoBehaviour {
     freeWill = RandomParent(parents).freeWill;
     hunger = RandomParent(parents).hunger;
     vision = RandomParent(parents).vision;
+    lifespan = RandomParent(parents).lifespan;
 
     if (Random.value < 0.05) {
       speed = Random.Range(0.1F, 1F);
     }
     if (Random.value < 0.05) {
       startingEnergy = Random.Range(0.1F, 1F);
+    }
+    if (Random.value < 0.05) {
+      lifespan = Random.Range(1F, 20F);
     }
     if (Random.value < 0.05) {
       freeWill = Random.Range(0F, 1F);
@@ -69,6 +76,7 @@ public class Agent : MonoBehaviour {
     dead = false;
     finished = false;
     energy = startingEnergy;
+    lifeRemaining = lifespan;
     SetColor(renderer.material.color);
     transform.position = currentTile.CenterTop();
     transform.localScale = transform.localScale + new Vector3(0, Random.Range(-0.1F, 0.1F), 0);
@@ -221,10 +229,14 @@ public class Agent : MonoBehaviour {
 
       // Reduce energy for lifespan
       energy -= Time.deltaTime * EnergyUsageRate();
+      lifeRemaining -= Time.deltaTime * 1 / lifespan;
 
       SetColorToHealth();
 
       if (energy <= 0F) {
+        Die();
+      }
+      else if (lifeRemaining <= 0F) {
         Die();
       }
     }
