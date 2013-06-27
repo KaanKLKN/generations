@@ -26,10 +26,7 @@ public class Map : MonoBehaviour {
         float val = Random.value;
         MapTileType type = MapTileType.Free;
 
-        if (val < 0.25) {
-          type = MapTileType.Free;
-        }
-        else if (val > 0.25 && val < 0.28) {
+        if (val < 0.1) {
           type = MapTileType.Food;
         }
 
@@ -53,7 +50,7 @@ public class Map : MonoBehaviour {
     tiles = new MapTile[size, size];
 
     double[,] tileHeightmap = new PlasmaFractalGenerator().Generate(size, size, 50);
-    double[,] tileColormap = new PlasmaFractalGenerator().Generate(size, size, 50);
+    double[,] tileHuemap = new PlasmaFractalGenerator().Generate(size, size, 50);
 
     for (int i=0; i < size; i++) {
        for (int j=0; j < size; j++){
@@ -88,6 +85,7 @@ public class Map : MonoBehaviour {
         tile.type = type;
         tile.point = new MapPoint(i, j);
         tile.height = (float)tileHeightmap[i, j];
+        tile.hue = (float)tileHuemap[i, j];
 
         tiles[i, j] = tile;
 

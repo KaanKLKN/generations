@@ -97,25 +97,21 @@ public class Agent : MonoBehaviour {
 
     // Move to a random available tile
 
-    MapTile[] nearby = currentTile.PassableNeighboringTiles();
+    MapTile[] nearby = currentTile.PassableNeighboringTilesForAgent(this);
     if (nearby.Length == 1) {
       MoveToTile(nearby[0]);
       return;
     }
 
-    MapTile[] exits = currentTile.NeighboringTilesOfType(MapTileType.End);
-    if (exits.Length > 0) {
-      MoveToTile(exits[0]);
-      return;
-    }
-
     // Make a decision based on hunger
-    MapTile[] foodspots = RejectLockedOutTilesFromTiles(currentTile.NeighboringTilesOfType(MapTileType.Food));
-    if (foodspots.Length > 0 && Random.value < hunger) {
-      FoodTile foodTile = foodspots[0] as FoodTile;
-      if (foodTile.CanConsumeFood(this)) {
-        MoveToTile(foodspots[0]);
-        return;
+    if (IsHungry()) {
+      MapTile[] foodspots = currentTile.PassableNeighboringTilesOfTypeForAgent(MapTileType.Food, this);
+      if (foodspots.Length > 0 && Random.value < hunger) {
+        FoodTile foodTile = foodspots[0] as FoodTile;
+        if (foodTile.CanConsumeFood(this)) {
+          MoveToTile(foodspots[0]);
+          return;
+        }
       }
     }
 
@@ -128,10 +124,10 @@ public class Agent : MonoBehaviour {
     else {
       // Fit in
       //MapTile[] inDirection = RejectPreviousTiles(currentTile.NeighboringTilesClosestTo(manager.map.endTile));
-      MapTile forwardTile = currentTile.NeighboringTileInDirection(CurrentDirection());
-      if (forwardTile != null)
-        MoveToTile(forwardTile);
-      else
+      //MapTile forwardTile = currentTile.NeighboringTileInDirection(CurrentDirection());
+      //if (forwardTile != null)
+       // MoveToTile(forwardTile);
+      //else
         MoveToTile(nearby[0]);
     }
 
@@ -160,12 +156,18 @@ public class Agent : MonoBehaviour {
     UpdateAI();
   }
 
+  bool IsHungry() {
+    return energy < 0.75;
+  }
+
   void EatFoodTile() {
     FoodTile food = currentTile as FoodTile;
-    if (food.ConsumeFood(this)) {
-      energy += food.foodEnergy;
-      if (energy > 1)
-        energy = 1;
+    if (IsHungry()) {
+      if (food.ConsumeFood(this)) {
+        energy += food.foodEnergy;
+        if (energy > 1)
+          energy = 1;
+      }
     }
   }
 
@@ -234,6 +236,10 @@ public class Agent : MonoBehaviour {
     return deathDate - Time.time;
   }
 
+  float LifeRemainingPercent() {
+    return LifeRemaining() / lifespan;
+  }
+
   void Update() {
 
     if (!dead && !finished) {
@@ -261,7 +267,9 @@ public class Agent : MonoBehaviour {
     iTween.Stop(gameObject);
     SetColor(Color.black);
     fitness = Fitness();
+    currentTile.AgentDidExit(this);
     manager.OnAgentDeath(this);
+    StartCoroutine(EraseBodySoon());
   }
 
   void Finish() {
@@ -269,7 +277,20 @@ public class Agent : MonoBehaviour {
     iTween.Stop(gameObject);
     fitness = Fitness();
     SetColor(Color.magenta);
+    currentTile.AgentDidExit(this);
     manager.OnAgentFinish(this);
+    StartCoroutine(EraseBodySoon());
+  }
+
+  IEnumerator EraseBodySoon() {
+    yield return new WaitForSeconds(2);
+    //EraseBody();
+    Vector3 newPos = transform.position + new Vector3(0, -2, 0);
+    iTween.MoveTo(gameObject, iTween.Hash("position", newPos, "duration", 1, "easetype", "linear", "oncomplete", "EraseBody"));
+  }
+
+  void EraseBody() {
+    renderer.enabled = false;
   }
 
   public float Fitness() {
@@ -293,7 +314,7 @@ public class Agent : MonoBehaviour {
   float reproductionCost = 0.25F;
 
   public bool CanReproduce() {
-    if (energy > reproductionCost) {
+    if (!manager.PopulationCeilingExceeded() && energy > reproductionCost && LifeRemainingPercent() < 0.8) {
       Agent[] otherAgents = currentTile.AgentsHereExcluding(this);
       if (otherAgents.Length > 0) {
         return true;
@@ -309,8 +330,21 @@ public class Agent : MonoBehaviour {
     }
   }
 
-  public void ReproduceWith(Agent agent) {
+  public Agent ReproduceWith(Agent otherParent) {
 
+    energy -= reproductionCost;
+    otherParent.energy -= reproductionCost;
+
+    Agent child = manager.BirthAgent();
+
+    child.currentTile = currentTile;
+
+    Agent[] parents = new Agent[2];
+    parents[0] = this;
+    parents[1] = otherParent;
+    child.CreateFromParents(parents);
+
+    return child;
   }
 
 }

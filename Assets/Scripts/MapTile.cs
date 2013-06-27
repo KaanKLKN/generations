@@ -28,12 +28,19 @@ public class MapTile : MonoBehaviour {
   public MapPoint point;
   public Map map;
   public float height;
+  public float hue;
 
   public virtual void Start() {
     if (map != null)
       transform.position = Center();
 
-    transform.localScale = new Vector3(1F, height * 3, 1F);
+    transform.localScale = new Vector3(1F, height * 4, 1F);
+
+    SetColorForHeight();
+  }
+
+  void SetColorForHeight() {
+    SetColor(new HSBColor(hue, 0.6F, height).ToColor());
   }
 
   public Vector3 Origin() {
@@ -63,7 +70,7 @@ public class MapTile : MonoBehaviour {
 
   public MapTile[] NeighboringTilesClosestTo(MapTile otherTile) {
     List<MapTile> list = new List<MapTile>();
-    list.AddRange(PassableNeighboringTiles());
+    list.AddRange(NeighboringTiles());
     return list.OrderBy(a => a.point.DistanceFromMapPoint(otherTile.point)).ToArray();
   }
 
@@ -86,18 +93,18 @@ public class MapTile : MonoBehaviour {
     return neighborList.ToArray( typeof( MapTile ) ) as MapTile[];
   }
 
-  public MapTile[] PassableNeighboringTiles() {
+  public MapTile[] PassableNeighboringTilesForAgent(Agent agent) {
     ArrayList neighborList = new ArrayList();
     foreach (MapTile tile in NeighboringTiles()) {
-        if (tile.type != MapTileType.Blocked)
+        if (tile.PassableFromTileForAgent(tile, agent))
             neighborList.Add(tile);
     }
     return neighborList.ToArray( typeof( MapTile ) ) as MapTile[];
   }
 
-  public MapTile[] NeighboringTilesOfType(MapTileType type) {
+  public MapTile[] PassableNeighboringTilesOfTypeForAgent(MapTileType type, Agent agent) {
     ArrayList neighborList = new ArrayList();
-    foreach (MapTile tile in NeighboringTiles()) {
+    foreach (MapTile tile in PassableNeighboringTilesForAgent(agent)) {
         if (tile.type == type)
             neighborList.Add(tile);
     }
@@ -127,6 +134,24 @@ public class MapTile : MonoBehaviour {
             others.Add(otherAgent);
     }
     return others.ToArray( typeof( Agent ) ) as Agent[];
+  }
+
+  // Passability
+
+  public bool PassableFromTileForAgent(MapTile destinationTile, Agent agent) {
+    float heightDifference = Mathf.Abs(destinationTile.height - height);
+    return heightDifference < 0.2;
+  }
+
+  // Appearance
+
+  Material recoloredMaterial;
+  public void SetColor(Color color) {
+      if (recoloredMaterial == null) {
+        recoloredMaterial = new Material(renderer.material);
+        renderer.material = recoloredMaterial;
+      }
+    recoloredMaterial.color = color;
   }
 
 }

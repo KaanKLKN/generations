@@ -9,6 +9,9 @@ public class AgentManager : MonoBehaviour {
   public int agentsPerGeneration = 50;
   public GameObject agentPrefab;
 
+  public int populationCeiling = 500;
+
+  int livingAgents;
   int deadAgents;
   int finishedAgents;
   int generation;
@@ -35,6 +38,7 @@ public class AgentManager : MonoBehaviour {
 
     previousDead = deadAgents;
     previousFinished = finishedAgents;
+    livingAgents = 0;
 
     // Build agents if we don't have any.
 
@@ -50,7 +54,6 @@ public class AgentManager : MonoBehaviour {
     for (int i=0; i < agentsPerGeneration; i++) {
       
         Agent agent = BirthAgent();
-
         if (generation < 2) {
           agent.CreateRandom();
         }
@@ -60,10 +63,13 @@ public class AgentManager : MonoBehaviour {
           parents[1] = previousAgents[Random.Range(0, previousAgents.Length)];
           agent.CreateFromParents(parents);
         }
-
     }
 
     CalculateAverages();
+  }
+
+  public bool PopulationCeilingExceeded() {
+    return livingAgents > populationCeiling;
   }
 
   public Agent BirthAgent() {
@@ -75,6 +81,7 @@ public class AgentManager : MonoBehaviour {
     agent.manager = this;
 
     currentAgents.Add(agent);
+    livingAgents++;
 
     return agent;
   }
@@ -86,11 +93,12 @@ public class AgentManager : MonoBehaviour {
 
   public void OnAgentDeath(Agent deadAgent) {
     deadAgents += 1;
+    livingAgents -= 1;
     CheckGenerationComplete();
   }
 
   int LivingAgents() {
-    return agentsPerGeneration - deadAgents - finishedAgents;
+    return livingAgents;
   }
 
   int PreviousLivingAgents() {

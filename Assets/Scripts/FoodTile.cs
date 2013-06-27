@@ -4,8 +4,8 @@ using System.Collections;
 public class FoodTile : MapTile {
 
   public int startingFood = 1;
-  public float foodEnergy = 0.5F;
-  public float replenishTime = 2;
+  public float foodEnergy = 1F;
+  public float replenishTime = 5;
 
   public int availableFood;
 
@@ -54,15 +54,6 @@ public class FoodTile : MapTile {
     availableFood = startingFood;
     StatusDidChange();
     respawning = false;
-  }
-
-  Material recoloredMaterial;
-  void SetColor(Color color) {
-      if (recoloredMaterial == null) {
-        recoloredMaterial = new Material(renderer.material);
-        renderer.material = recoloredMaterial;
-      }
-    recoloredMaterial.color = color;
   }
 
 }
