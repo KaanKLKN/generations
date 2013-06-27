@@ -302,6 +302,8 @@ public class Agent : MonoBehaviour {
   public float fitness;
 
   void Die() {
+    Notify(AgentNotificationType.Death);
+
     deathTime = Time.time;
     dead = true;
     iTween.Stop(gameObject);
@@ -405,6 +407,9 @@ public class Agent : MonoBehaviour {
 
     manager.IncrementCounter("Reproduced", 1);
     Notify(AgentNotificationType.Sex);
+    otherParent.Notify(AgentNotificationType.Sex);
+
+    child.Notify(AgentNotificationType.Birth);
 
     return child;
   }
