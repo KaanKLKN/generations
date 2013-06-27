@@ -26,7 +26,7 @@ public class Map : MonoBehaviour {
         float val = Random.value;
         MapTileType type = MapTileType.Free;
 
-        if (val < 0.1) {
+        if (val < 0.3) {
           type = MapTileType.Food;
         }
 
@@ -36,7 +36,7 @@ public class Map : MonoBehaviour {
     }
 
     // Add a start tile
-    //tileTypes[Random.Range(0, size / 4), Random.Range(0, size)] = MapTileType.Start;
+    tileTypes[Random.Range(0, size / 4), Random.Range(0, size)] = MapTileType.Start;
 
     // Add an end tile
     //tileTypes[Random.Range(size - size / 4, size), Random.Range(0, size)] = MapTileType.End;
@@ -128,11 +128,6 @@ public class Map : MonoBehaviour {
       float absoluteWidth  = size  * TileSize();
       float absoluteHeight = size  * TileSize();
       return new Bounds(Center(), new Vector3(absoluteWidth, 1000, absoluteHeight));
-  }
-  
-  // Update is called once per frame
-  void Update () {
-  
   }
 
 }

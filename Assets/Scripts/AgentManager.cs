@@ -47,7 +47,8 @@ public class AgentManager : MonoBehaviour {
     }
 
     currentAgents = new ArrayList();
-
+    ResetCounters();
+    
     deadAgents = 0;
     finishedAgents = 0;
 
@@ -77,7 +78,7 @@ public class AgentManager : MonoBehaviour {
     agentObject.transform.parent = this.transform;
 
     Agent agent = agentObject.GetComponent<Agent>();
-    agent.currentTile = map.RandomTile();
+    agent.currentTile = map.startTile;//map.RandomTile();
     agent.manager = this;
 
     currentAgents.Add(agent);
@@ -130,6 +131,21 @@ public class AgentManager : MonoBehaviour {
     Generate(fittest);
   }
 
+  Dictionary<string, int> counters = new Dictionary<string, int>();
+
+  public void ResetCounters() {
+    counters = new Dictionary<string, int>();
+  }
+
+  public void IncrementCounter(string name, int incrementAmount) {
+
+    int value;
+    if (!counters.TryGetValue(name, out value)) {
+      value = 0;
+    }
+
+    counters[name] = value + incrementAmount;
+  }
 
   float previousSpeed;
   float currentSpeed;
@@ -159,11 +175,15 @@ public class AgentManager : MonoBehaviour {
 
   void OnGUI(){
     GUILayout.BeginHorizontal ("box");
-    GUILayout.Label("Generation " + generation);
-    GUILayout.Label(" | Living: " + LivingAgents());
-    GUILayout.Label(" | Finished: " + finishedAgents + " (" + DeltaString(finishedAgents - previousFinished) + ")");
-    GUILayout.Label(" | Dead: " + deadAgents);
+    GUILayout.Label("Spawn generation " + generation);
     GUILayout.EndHorizontal ();
+
+    GUILayout.BeginVertical ("box");
+    GUILayout.Label("Living: " + LivingAgents());
+    foreach(KeyValuePair<string, int> counter in counters) {
+      GUILayout.Label(counter.Key + ": " + counter.Value);
+    }
+    GUILayout.EndVertical ();
 
     GUILayout.BeginVertical ("box");
     GUILayout.Label("Averages:");

@@ -5,7 +5,7 @@ public class FoodTile : MapTile {
 
   public int startingFood = 1;
   public float foodEnergy = 1F;
-  public float replenishTime = 5;
+  public float replenishTime = 2;
 
   public int availableFood;
 
@@ -46,7 +46,7 @@ public class FoodTile : MapTile {
   void OutOfFood() {
     if (!respawning) {
       respawning = true;
-      Invoke("ReplenishFood", replenishTime);
+      Invoke("ReplenishFood", replenishTime / (float)Agent.timeScaleFactor);
     }
   }
 

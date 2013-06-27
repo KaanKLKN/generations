@@ -11,6 +11,7 @@ public class Agent : MonoBehaviour {
   public float vision;
   public float startingEnergy;
   public float lifespan;
+  public int timesReproduced;
 
   public float energy;
 
@@ -25,10 +26,23 @@ public class Agent : MonoBehaviour {
   public float birthTime;
   public float deathTime;
 
+  public static float timeScaleFactor = 1;
+
+  private static float mutationChance = 0.05F; // 0-1
+
+  private static float _minLifespan = 15; // seconds
+  private static float _maxLifespan = 15; // seconds
+
+  private static float _minEnergy = 0.8F;
+  private static float _maxEnergy = 1.0F;
+
+  private static float _minSpeed = 0.5F;
+  private static float _maxSpeed = 3.0F;
+
   public void CreateRandom() {
-    speed = Random.Range(0.1F, 1F);
-    startingEnergy = Random.Range(0.5F, 1F);
-    lifespan = Random.Range(1F, 10F);
+    speed = Random.Range(_minSpeed, _maxSpeed);
+    startingEnergy = Random.Range(_minEnergy, _maxEnergy);
+    lifespan = Random.Range(_minLifespan, _maxLifespan);
     freeWill = Random.Range(0F, 1F);
     hunger = Random.Range(0F, 1F);
     vision = Random.Range(0, 10);
@@ -45,22 +59,22 @@ public class Agent : MonoBehaviour {
     vision = RandomParent(parents).vision;
     lifespan = RandomParent(parents).lifespan;
 
-    if (Random.value < 0.05) {
-      speed = Random.Range(0.1F, 1F);
+    if (Random.value < mutationChance) {
+      speed = Random.Range(_minSpeed, _maxSpeed);
     }
-    if (Random.value < 0.05) {
-      startingEnergy = Random.Range(0.1F, 1F);
+    if (Random.value < mutationChance) {
+      startingEnergy = Random.Range(_minEnergy, _maxEnergy);
     }
-    if (Random.value < 0.05) {
-      lifespan = Random.Range(1F, 10F);
+    if (Random.value < mutationChance) {
+      lifespan = Random.Range(_minLifespan, _maxLifespan);
     }
-    if (Random.value < 0.05) {
+    if (Random.value < mutationChance) {
       freeWill = Random.Range(0F, 1F);
     }
-    if (Random.value < 0.05) {
+    if (Random.value < mutationChance) {
       hunger = Random.Range(0F, 1F);
     }
-    if (Random.value < 0.05) {
+    if (Random.value < mutationChance) {
       vision = Random.Range(0, 10);
     }
 
@@ -79,6 +93,7 @@ public class Agent : MonoBehaviour {
     transform.position = currentTile.CenterTop();
     transform.localScale = transform.localScale + new Vector3(0, Random.Range(-0.1F, 0.1F), 0);
     birthTime = Time.time;
+    manager.IncrementCounter("Born", 1);
     UpdateAI();
   }
     
@@ -132,7 +147,7 @@ public class Agent : MonoBehaviour {
     }
 
     // Decision cost
-    //energy -= 0.05F;
+    //energy -= 0.01F;
 
   }
 
@@ -167,6 +182,7 @@ public class Agent : MonoBehaviour {
         energy += food.foodEnergy;
         if (energy > 1)
           energy = 1;
+        manager.IncrementCounter("Ate", 1);
       }
     }
   }
@@ -226,18 +242,22 @@ public class Agent : MonoBehaviour {
   }
 
   float EnergyUsageRate() {
-    float rate = 0.02F; // Lifespan
-    rate += NormalizedSpeed() / 20; // Faster guys use more energy
+    float rate = 0.01F * timeScaleFactor; // Lifespan
+    //rate += speed / 100; // Faster guys use more energy
     return rate;
   }
 
   float LifeRemaining() {
-    float deathDate = birthTime + lifespan;
-    return deathDate - Time.time;
+    float deathDate = birthTime + (lifespan / timeScaleFactor);
+    return (deathDate - Time.time);
   }
 
   float LifeRemainingPercent() {
-    return LifeRemaining() / lifespan;
+    return LifeRemaining() / (lifespan / timeScaleFactor);
+  }
+
+  float TimeToDieOfHunger() {
+    return (lifespan / timeScaleFactor) * 0.5F;
   }
 
   void Update() {
@@ -245,14 +265,18 @@ public class Agent : MonoBehaviour {
     if (!dead && !finished) {
 
       // Reduce energy for lifespan
-      energy -= Time.deltaTime * EnergyUsageRate();
+      energy -= Time.deltaTime * (1 / TimeToDieOfHunger());
 
       SetColorToHealth();
 
       if (energy <= 0F) {
+        manager.IncrementCounter("Died", 1);
+        manager.IncrementCounter("Died of Starvation", 1);
         Die();
       }
       else if (LifeRemaining() <= 0F) {
+        manager.IncrementCounter("Died", 1);
+        manager.IncrementCounter("Died of Old Age", 1);
         Die();
       }
     }
@@ -306,34 +330,51 @@ public class Agent : MonoBehaviour {
   }
 
   float NormalizedSpeed() {
-    return speed * 16;
+    return speed * timeScaleFactor;
   }
 
   // Reproduction
 
-  float reproductionCost = 0.25F;
+  static float reproductionCost = 0.25F;
+  static float reproductionThreshold = 0.8F;
+  static int maxChildren = 4;
 
   public bool CanReproduce() {
-    if (!manager.PopulationCeilingExceeded() && energy > reproductionCost && LifeRemainingPercent() < 0.8) {
-      Agent[] otherAgents = currentTile.AgentsHereExcluding(this);
-      if (otherAgents.Length > 0) {
-        return true;
-      }
+    // && LifeRemainingPercent() < 0.8
+    if (!manager.PopulationCeilingExceeded() && energy > reproductionThreshold && timesReproduced < maxChildren) {
+      return true;
     }
     return false;
   }
 
   public void ReproduceIfPossible() {
     if (CanReproduce()) {
+      // Find other agents
       Agent[] otherAgents = currentTile.AgentsHereExcluding(this);
-      ReproduceWith(otherAgents[0]);
+      if (otherAgents.Length > 0) {
+        Agent[] fertileAgents = SelectFertileAgents(otherAgents);
+        if (fertileAgents.Length > 0) {
+          ReproduceWith(fertileAgents[0]);          
+        }
+      }
     }
+  }
+
+  public Agent[] SelectFertileAgents(Agent[] agents) {
+    ArrayList fertile = new ArrayList();
+    foreach (Agent agent in agents) {
+        if (agent.CanReproduce())
+            fertile.Add(agent);
+    }
+    return fertile.ToArray( typeof( Agent ) ) as Agent[];
   }
 
   public Agent ReproduceWith(Agent otherParent) {
 
     energy -= reproductionCost;
+    timesReproduced++;
     otherParent.energy -= reproductionCost;
+    otherParent.timesReproduced++;
 
     Agent child = manager.BirthAgent();
 
@@ -343,6 +384,10 @@ public class Agent : MonoBehaviour {
     parents[0] = this;
     parents[1] = otherParent;
     child.CreateFromParents(parents);
+
+    child.energy = reproductionThreshold;
+
+    manager.IncrementCounter("Reproduced", 1);
 
     return child;
   }
