@@ -11,6 +11,7 @@ public class Agent : MonoBehaviour {
   public float vision;
   public float startingEnergy;
   public float lifespan;
+  public float hue;
   public int timesReproduced;
 
   public float energy;
@@ -30,19 +31,20 @@ public class Agent : MonoBehaviour {
 
   private static float mutationChance = 0.05F; // 0-1
 
-  private static float _minLifespan = 15; // seconds
-  private static float _maxLifespan = 15; // seconds
+  private static float _minLifespan = 25; // seconds
+  private static float _maxLifespan = 35; // seconds
 
   private static float _minEnergy = 0.8F;
   private static float _maxEnergy = 1.0F;
 
   private static float _minSpeed = 0.5F;
-  private static float _maxSpeed = 3.0F;
+  private static float _maxSpeed = 4.0F;
 
   public void CreateRandom() {
     speed = Random.Range(_minSpeed, _maxSpeed);
     startingEnergy = Random.Range(_minEnergy, _maxEnergy);
     lifespan = Random.Range(_minLifespan, _maxLifespan);
+    hue = Random.Range(0F, 1F);
     freeWill = Random.Range(0F, 1F);
     hunger = Random.Range(0F, 1F);
     vision = Random.Range(0, 10);
@@ -51,6 +53,8 @@ public class Agent : MonoBehaviour {
   }
 
   public void CreateFromParents(Agent[] parents) {
+
+    hue = Random.Range(parents[0].hue, parents[1].hue);
 
     speed = RandomParent(parents).speed;
     startingEnergy = RandomParent(parents).startingEnergy;
@@ -72,6 +76,9 @@ public class Agent : MonoBehaviour {
       freeWill = Random.Range(0F, 1F);
     }
     if (Random.value < mutationChance) {
+      hue = Random.Range(0F, 1F);
+    }
+    if (Random.value < mutationChance) {
       hunger = Random.Range(0F, 1F);
     }
     if (Random.value < mutationChance) {
@@ -89,7 +96,7 @@ public class Agent : MonoBehaviour {
     dead = false;
     finished = false;
     energy = startingEnergy;
-    SetColor(renderer.material.color);
+    SetColor(new HSBColor(hue, 1, 1).ToColor());
     transform.position = currentTile.CenterTop();
     transform.localScale = transform.localScale + new Vector3(0, Random.Range(-0.1F, 0.1F), 0);
     birthTime = Time.time;
@@ -267,7 +274,7 @@ public class Agent : MonoBehaviour {
       // Reduce energy for lifespan
       energy -= Time.deltaTime * (1 / TimeToDieOfHunger());
 
-      SetColorToHealth();
+      //SetColorToHealth();
 
       if (energy <= 0F) {
         manager.IncrementCounter("Died", 1);
@@ -335,8 +342,8 @@ public class Agent : MonoBehaviour {
 
   // Reproduction
 
-  static float reproductionCost = 0.25F;
-  static float reproductionThreshold = 0.8F;
+  static float reproductionCost = 0.1F;
+  static float reproductionThreshold = 0.5F;
   static int maxChildren = 4;
 
   public bool CanReproduce() {
