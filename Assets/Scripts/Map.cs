@@ -27,7 +27,7 @@ public class Map : MonoBehaviour {
         MapTileType type = MapTileType.Free;
 
         if (val < 0.25) {
-          type = MapTileType.Blocked;
+          type = MapTileType.Free;
         }
         else if (val > 0.25 && val < 0.28) {
           type = MapTileType.Food;
@@ -51,6 +51,8 @@ public class Map : MonoBehaviour {
 
   void BuildTiles(MapTileType[,] map) {
     tiles = new MapTile[size, size];
+
+    double[,] tileHeightmap = new PlasmaFractalGenerator().Generate(size, size, 50);
 
     for (int i=0; i < size; i++) {
        for (int j=0; j < size; j++){
@@ -84,6 +86,7 @@ public class Map : MonoBehaviour {
         tile.map = this;
         tile.type = type;
         tile.point = new MapPoint(i, j);
+        tile.height = (float)tileHeightmap[i, j];
 
         tiles[i, j] = tile;
 

@@ -15,7 +15,11 @@ public enum CardinalDirection {
   North,
   South,
   East,
-  West
+  West,
+  NorthEast,
+  NorthWest,
+  SouthEast,
+  SouthWest
 }
 
 public class MapTile : MonoBehaviour {
@@ -23,13 +27,13 @@ public class MapTile : MonoBehaviour {
   public MapTileType type;
   public MapPoint point;
   public Map map;
+  public float height;
 
   void Start() {
-    transform.position = Center();
+    if (map != null)
+      transform.position = Center();
 
-    if (type == MapTileType.Blocked) {
-      transform.localScale = new Vector3(1F, 1.5F, 1F);
-    }
+    transform.localScale = new Vector3(1F, height * 3, 1F);
   }
 
   public Vector3 Origin() {
@@ -41,7 +45,8 @@ public class MapTile : MonoBehaviour {
   }
 
   public Vector3 CenterTop() {
-    return Center() + new Vector3(0, Radius(), 0);
+    float height = ((BoxCollider)(collider)).size.y * transform.localScale.y;
+    return Center() + new Vector3(0, height / 2, 0);
   }
 
   public float Radius() {
@@ -64,7 +69,16 @@ public class MapTile : MonoBehaviour {
 
   public MapTile[] NeighboringTiles() {
     ArrayList neighborList = new ArrayList();
-    foreach (CardinalDirection direction in new ArrayList{CardinalDirection.North, CardinalDirection.South, CardinalDirection.West, CardinalDirection.East}) {
+    foreach (CardinalDirection direction in new ArrayList{
+        CardinalDirection.North, 
+        CardinalDirection.South, 
+        CardinalDirection.West, 
+        CardinalDirection.East,
+        CardinalDirection.NorthWest, 
+        CardinalDirection.SouthWest, 
+        CardinalDirection.SouthEast, 
+        CardinalDirection.NorthEast
+      }) {
       MapTile tile = NeighboringTileInDirection(direction);
       if (tile)
         neighborList.Add(tile);

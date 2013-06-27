@@ -26,6 +26,14 @@ public class MapPoint  {
         return new MapPoint(x + distance, y);
       case CardinalDirection.West:
         return new MapPoint(x - distance, y);
+      case CardinalDirection.NorthEast:
+        return new MapPoint(x + distance, y + distance);
+      case CardinalDirection.NorthWest:
+        return new MapPoint(x - distance, y + distance);
+      case CardinalDirection.SouthEast:
+        return new MapPoint(x + distance, y - distance);
+      case CardinalDirection.SouthWest:
+        return new MapPoint(x - distance, y - distance);
       default:
           Debug.Log("Big Problem!");
           return new MapPoint(x - distance, y);
@@ -41,11 +49,21 @@ public class MapPoint  {
   public CardinalDirection DirectionToMapPoint(MapPoint otherPoint) {
       
     if (otherPoint.x > x) {
-      return CardinalDirection.East;
+      if (otherPoint.y > y)
+        return CardinalDirection.NorthEast;
+      else if (otherPoint.y < y)
+        return CardinalDirection.SouthEast;
+      else
+        return CardinalDirection.East;
     }
     
     if (otherPoint.x < x) {
-      return CardinalDirection.West;
+      if (otherPoint.y > y)
+        return CardinalDirection.NorthWest;
+      else if (otherPoint.y < y)
+        return CardinalDirection.SouthWest;
+      else
+        return CardinalDirection.West;
     }
     
     if (otherPoint.y > y) {
