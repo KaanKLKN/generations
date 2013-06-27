@@ -4,7 +4,8 @@ using System.Collections;
 public enum AgentNotificationType {
   Sex,
   Birth,
-  Death
+  Death,
+  Ate
 }
 
 public class AgentNotifier : MonoBehaviour {
@@ -15,8 +16,10 @@ public class AgentNotifier : MonoBehaviour {
   public Texture2D sexTexture;
   public Texture2D birthTexture;
   public Texture2D deathTexture;
+  public Texture2D ateTexture;
 
   GameObject _notifierPlane;
+  Material _myMaterial;
 
   void Awake() {
 
@@ -41,22 +44,25 @@ public class AgentNotifier : MonoBehaviour {
       rotation.eulerAngles = new Vector3(0, 180, 0);
       _notifierPlane = Instantiate(notifierPlanePrefab, transform.position, rotation) as GameObject;
       _notifierPlane.transform.parent = transform;
+      _myMaterial = new Material(_notifierPlane.renderer.material);
+      _notifierPlane.renderer.material = _myMaterial;
     }
 
     _notifierPlane.transform.localScale = Vector3.zero;
     _notifierPlane.transform.position = transform.position;
 
-    Material newMaterial = new Material(_notifierPlane.renderer.material);
     if (type == AgentNotificationType.Sex) {
-      newMaterial.mainTexture = sexTexture;
+      _myMaterial.mainTexture = sexTexture;
     }
     else if (type == AgentNotificationType.Birth) {
-      newMaterial.mainTexture = birthTexture;
+      _myMaterial.mainTexture = birthTexture;
     }
     else if (type == AgentNotificationType.Death) {
-      newMaterial.mainTexture = deathTexture;
+      _myMaterial.mainTexture = deathTexture;
     }
-    _notifierPlane.renderer.material = newMaterial;
+    else if (type == AgentNotificationType.Ate) {
+      _myMaterial.mainTexture = ateTexture;
+    }
 
     _notifierPlane.renderer.enabled = true;
 

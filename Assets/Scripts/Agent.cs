@@ -196,6 +196,7 @@ public class Agent : MonoBehaviour {
         if (energy > 1)
           energy = 1;
         manager.IncrementCounter("Ate", 1);
+        Notify(AgentNotificationType.Ate);
       }
     }
   }
