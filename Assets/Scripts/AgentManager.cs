@@ -13,12 +13,12 @@ public class AgentManager : MonoBehaviour {
   int finishedAgents;
   int generation;
 
-  public Agent[] currentAgents;
+  public ArrayList currentAgents;
 
   void Start () {
 
     generation = 0;
-    currentAgents = new Agent[agentsPerGeneration];
+    currentAgents = new ArrayList();
 
     // Build the map
     map.Generate();
@@ -42,18 +42,14 @@ public class AgentManager : MonoBehaviour {
       Destroy(child.gameObject);
     }
 
+    currentAgents = new ArrayList();
+
     deadAgents = 0;
     finishedAgents = 0;
 
     for (int i=0; i < agentsPerGeneration; i++) {
       
-        GameObject agentObject = Instantiate(agentPrefab, Vector3.zero, Quaternion.identity) as GameObject;
-        agentObject.name = "Agent " + i;
-        agentObject.transform.parent = this.transform;
-
-        Agent agent = agentObject.GetComponent<Agent>();
-        agent.currentTile = map.RandomTile();
-        agent.manager = this;
+        Agent agent = BirthAgent();
 
         if (generation < 2) {
           agent.CreateRandom();
@@ -65,11 +61,22 @@ public class AgentManager : MonoBehaviour {
           agent.CreateFromParents(parents);
         }
 
-        currentAgents[i] = agent;
-
     }
 
     CalculateAverages();
+  }
+
+  public Agent BirthAgent() {
+    GameObject agentObject = Instantiate(agentPrefab, Vector3.zero, Quaternion.identity) as GameObject;
+    agentObject.transform.parent = this.transform;
+
+    Agent agent = agentObject.GetComponent<Agent>();
+    agent.currentTile = map.RandomTile();
+    agent.manager = this;
+
+    currentAgents.Add(agent);
+
+    return agent;
   }
 
   public void OnAgentFinish(Agent finishedAgent) {
@@ -99,7 +106,9 @@ public class AgentManager : MonoBehaviour {
   IEnumerator SelectFittestAndBeginNewGeneration() {
 
     List<Agent> list = new List<Agent>();
-    list.AddRange(currentAgents);
+    foreach (Agent agent in currentAgents) {
+      list.Add(agent);
+    }
     list = list.OrderBy(a => a.Fitness()).ToList();
 
     Agent[] fittest = list.GetRange(0, agentsPerGeneration / 3).ToArray();

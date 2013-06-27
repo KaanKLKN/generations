@@ -214,6 +214,7 @@ public class Agent : MonoBehaviour {
 
     iTween.MoveTo(gameObject, iTween.Hash("position", tile.RandomTop(), "speed", NormalizedSpeed(), "easetype", "linear", "oncomplete", "MoveToTileComplete", "orienttopath", false));
 
+    ReproduceIfPossible();
   }
 
   void SetColorToHealth() {
