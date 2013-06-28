@@ -7,11 +7,7 @@ public class Organ {
 
   public Agent agent;
 
-  public virtual string[] InheritableTraits() {
-    return new string[]{};
-  }
-
-  public Dictionary<string, object> InheritableTraitValues() {
+  public Dictionary<string, object> TraitValues() {
     Dictionary<string, object> traitValues = new Dictionary<string, object>();
     System.Reflection.FieldInfo[] fields = this.GetType().GetFields();
     foreach(System.Reflection.FieldInfo field in fields) {
@@ -25,16 +21,16 @@ public class Organ {
   }
 
   public void RandomizeTraits() {
-    foreach (var entry in InheritableTraitValues()) {
+    foreach (var entry in TraitValues()) {
       Trait trait = entry.Value as Trait;
       trait.Randomize();
     }
   }
 
   public void InheritTraitsFromParents(Organ mom, Organ dad) {
-    Dictionary<string, object> myTraits   = InheritableTraitValues();
-    Dictionary<string, object> momTraits  = mom.InheritableTraitValues();
-    Dictionary<string, object> dadTraits  = dad.InheritableTraitValues();
+    Dictionary<string, object> myTraits   = TraitValues();
+    Dictionary<string, object> momTraits  = mom.TraitValues();
+    Dictionary<string, object> dadTraits  = dad.TraitValues();
     foreach (var entry in myTraits) {
       Trait myTrait = entry.Value as Trait;
       myTrait.Inherit(momTraits[entry.Key] as Trait, dadTraits[entry.Key] as Trait);

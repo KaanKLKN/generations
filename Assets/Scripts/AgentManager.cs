@@ -91,6 +91,7 @@ public class AgentManager : MonoBehaviour {
 
     currentAgents.Add(agent);
     livingAgents++;
+    CalculateTraitAverages();
 
     return agent;
   }
@@ -104,6 +105,8 @@ public class AgentManager : MonoBehaviour {
     deadAgents += 1;
     livingAgents -= 1;
     CheckGenerationComplete();
+    currentAgents.Remove(deadAgent);
+    CalculateTraitAverages();
   }
 
   int LivingAgents() {
@@ -155,6 +158,28 @@ public class AgentManager : MonoBehaviour {
     counters[name] = value + incrementAmount;
   }
 
+  Dictionary<string, float> traitAverages = new Dictionary<string, float>();
+
+  public void CalculateTraitAverages() {
+    Dictionary<string, float> traitSums = new Dictionary<string, float>();
+    foreach (Agent agent in currentAgents) {
+      foreach (var pair in agent.Traits()) {
+        NumericalTrait trait = pair.Value as NumericalTrait;
+        if (trait != null) {
+          float value;
+          if (!traitSums.TryGetValue(pair.Key, out value)) {
+            value = 0;
+          }
+          traitSums[pair.Key] = value + trait.floatValue;
+        }
+      }
+    }
+
+    foreach (var pair in traitSums) {
+      traitAverages[pair.Key] = pair.Value / currentAgents.Count;
+    }
+  }
+
   float previousSpeed;
   float currentSpeed;
 
@@ -192,8 +217,9 @@ public class AgentManager : MonoBehaviour {
 
     GUILayout.BeginVertical ("box");
     GUILayout.Label("Averages:");
-    GUILayout.Label("Speed: " + currentSpeed + " (" + DeltaString(currentSpeed - previousSpeed) + ")");
-    GUILayout.Label("Hunger: " + currentHunger + " (" + DeltaString(currentHunger - previousHunger) + ")");
+    foreach(var average in traitAverages) {
+      GUILayout.Label(average.Key + ": " + average.Value);
+    }
     GUILayout.EndVertical ();
 
   }

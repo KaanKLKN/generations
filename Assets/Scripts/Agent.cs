@@ -51,6 +51,16 @@ public class Agent : MonoBehaviour {
     return new Organ[] {reproductiveSystem};
   }
 
+  public Dictionary<string, Trait> Traits() {
+    Dictionary<string, Trait> traitValues = new Dictionary<string, Trait>();
+    foreach (Organ organ in Organs()) {
+      foreach (var entry in organ.TraitValues()) {
+        traitValues[entry.Key] = entry.Value as Trait;
+      }
+    }
+    return traitValues;
+  }
+
   public void InitializeAgent() {
     foreach (Organ organ in Organs()) {
       organ.agent = this;
