@@ -12,4 +12,8 @@ public class Body : Organ {
   public NumericalTrait hue = new NumericalTrait(0, 1); 
   public NumericalTrait hunger = new NumericalTrait(0, 1); 
 
+  public float CamouflageFactor() {
+    return Mathf.Abs(hue.floatValue - agent.currentTile.hue);
+  }
+
 }

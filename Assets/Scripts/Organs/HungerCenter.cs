@@ -71,8 +71,10 @@ public class HungerCenter : Organ {
     if (otherAgents.Length > 0) {
       Agent[] weakerAgents = SelectWeakerAgents(otherAgents);
       if (weakerAgents.Length > 0) {
-        EatAgent(weakerAgents[Random.Range(0, weakerAgents.Length)]);
-        return true;          
+        if (Random.value < agent.body.CamouflageFactor()) {
+          EatAgent(weakerAgents[Random.Range(0, weakerAgents.Length)]);
+          return true;          
+        }
       }
     }
     return false;
