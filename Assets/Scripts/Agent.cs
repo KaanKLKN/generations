@@ -5,7 +5,6 @@ using System.Linq;
 
 public class Agent : MonoBehaviour {
 
-  public float strength;
   public float hunger;
   public float vision;
   public float startingEnergy;
@@ -32,9 +31,6 @@ public class Agent : MonoBehaviour {
 
   private static float _minEnergy = 0.8F;
   private static float _maxEnergy = 1.0F;
-
-  private static float _minStrength = 0F;
-  private static float _maxStrength = 1F;
 
   public ReproductiveSystem reproductiveSystem = new ReproductiveSystem();
   public Body body = new Body();
@@ -69,7 +65,6 @@ public class Agent : MonoBehaviour {
         //Debug.Log(entry.Key + " : " + entry.Value); 
 
     startingEnergy = Random.Range(_minEnergy, _maxEnergy);
-    strength = Random.Range(_minStrength, _maxStrength);
 
     hue = Random.Range(0F, 1F);
     hunger = Random.Range(0F, 1F);
@@ -90,15 +85,11 @@ public class Agent : MonoBehaviour {
     //fertility = Random.Range(parents[0].fertility, parents[1].fertility);
 
     startingEnergy = RandomParent(parents).startingEnergy;
-    strength = RandomParent(parents).strength;
     hunger = RandomParent(parents).hunger;
     vision = RandomParent(parents).vision;
 
     if (Random.value < mutationChance) {
       startingEnergy = Random.Range(_minEnergy, _maxEnergy);
-    }
-    if (Random.value < mutationChance) {
-      strength = Random.Range(_minStrength, _maxStrength);
     }
     if (Random.value < mutationChance) {
       hue = Random.Range(0F, 1F);
@@ -412,7 +403,7 @@ public class Agent : MonoBehaviour {
   public Agent[] SelectWeakerAgents(Agent[] agents) {
     ArrayList fertile = new ArrayList();
     foreach (Agent agent in agents) {
-        if (agent.strength < strength)
+        if (agent.body.strength.floatValue < body.strength.floatValue)
             fertile.Add(agent);
     }
     return fertile.ToArray( typeof( Agent ) ) as Agent[];
