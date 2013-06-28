@@ -10,7 +10,6 @@ public class Agent : MonoBehaviour {
   public float hunger;
   public float vision;
   public float startingEnergy;
-  public float lifespan;
   public float fertility;
   public float hue;
   public int timesReproduced;
@@ -32,9 +31,6 @@ public class Agent : MonoBehaviour {
 
   private static float mutationChance = 0.05F; // 0-1
 
-  private static float _minLifespan = 25; // seconds
-  private static float _maxLifespan = 35; // seconds
-
   private static float _minEnergy = 0.8F;
   private static float _maxEnergy = 1.0F;
 
@@ -45,10 +41,11 @@ public class Agent : MonoBehaviour {
   private static float _maxStrength = 1F;
 
   public ReproductiveSystem reproductiveSystem = new ReproductiveSystem();
+  public Body body = new Body();
   public int timesEaten = 0;
 
   public Organ[] Organs() {
-    return new Organ[] {reproductiveSystem};
+    return new Organ[] {reproductiveSystem, body};
   }
 
   public Dictionary<string, Trait> Traits() {
@@ -77,7 +74,6 @@ public class Agent : MonoBehaviour {
 
     speed = Random.Range(_minSpeed, _maxSpeed);
     startingEnergy = Random.Range(_minEnergy, _maxEnergy);
-    lifespan = Random.Range(_minLifespan, _maxLifespan);
     strength = Random.Range(_minStrength, _maxStrength);
 
     hue = Random.Range(0F, 1F);
@@ -92,7 +88,8 @@ public class Agent : MonoBehaviour {
     Agent mom = parents[0];
     Agent dad = parents[1];
 
-    reproductiveSystem.InheritTraitsFromParents(mom.reproductiveSystem, dad.reproductiveSystem);
+    reproductiveSystem.InheritTraitsFromParents(mom.reproductiveSystem, dad.reproductiveSystem, mutationChance);
+    body.InheritTraitsFromParents(mom.body, dad.body, mutationChance);
 
     hue = Random.Range(parents[0].hue, parents[1].hue);
     //fertility = Random.Range(parents[0].fertility, parents[1].fertility);
@@ -102,16 +99,12 @@ public class Agent : MonoBehaviour {
     strength = RandomParent(parents).strength;
     hunger = RandomParent(parents).hunger;
     vision = RandomParent(parents).vision;
-    lifespan = RandomParent(parents).lifespan;
 
     if (Random.value < mutationChance) {
       speed = Random.Range(_minSpeed, _maxSpeed);
     }
     if (Random.value < mutationChance) {
       startingEnergy = Random.Range(_minEnergy, _maxEnergy);
-    }
-    if (Random.value < mutationChance) {
-      lifespan = Random.Range(_minLifespan, _maxLifespan);
     }
     if (Random.value < mutationChance) {
       strength = Random.Range(_minStrength, _maxStrength);
@@ -294,16 +287,16 @@ public class Agent : MonoBehaviour {
   }
 
   float LifeRemaining() {
-    float deathDate = birthTime + (lifespan / timeScaleFactor);
+    float deathDate = birthTime + (body.lifespan.floatValue / timeScaleFactor);
     return (deathDate - Time.time);
   }
 
   float LifeRemainingPercent() {
-    return LifeRemaining() / (lifespan / timeScaleFactor);
+    return LifeRemaining() / (body.lifespan.floatValue / timeScaleFactor);
   }
 
   float TimeToDieOfHunger() {
-    return (lifespan / timeScaleFactor) * 0.5F;
+    return (body.lifespan.floatValue / timeScaleFactor) * 0.5F;
   }
 
   void Update() {

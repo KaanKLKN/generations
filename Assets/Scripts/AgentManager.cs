@@ -68,7 +68,6 @@ public class AgentManager : MonoBehaviour {
         }
     }
 
-    CalculateAverages();
   }
 
   public bool PopulationCeilingExceeded() {
@@ -180,25 +179,6 @@ public class AgentManager : MonoBehaviour {
     }
   }
 
-  float previousSpeed;
-  float currentSpeed;
-
-  float previousHunger;
-  float currentHunger;
-
-  void CalculateAverages() {
-    previousSpeed = currentSpeed;
-    currentSpeed = 0;
-    previousHunger = currentHunger;
-    currentHunger = 0;
-    foreach(Agent agent in currentAgents) {
-      currentSpeed += agent.speed;
-      currentHunger += agent.hunger;
-    }
-    currentSpeed = currentSpeed / agentsPerGeneration;
-    currentHunger = currentHunger / agentsPerGeneration;
-  }
-
   void OnGUI(){
     if (GUILayout.Button("New Map")) {
       Application.LoadLevel ("main");
@@ -216,7 +196,7 @@ public class AgentManager : MonoBehaviour {
     GUILayout.EndVertical ();
 
     GUILayout.BeginVertical ("box");
-    GUILayout.Label("Averages:");
+    GUILayout.Label("INHERITED TRAITS");
     foreach(var average in traitAverages) {
       GUILayout.Label(average.Key + ": " + average.Value);
     }

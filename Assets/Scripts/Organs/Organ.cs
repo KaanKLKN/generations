@@ -27,13 +27,18 @@ public class Organ {
     }
   }
 
-  public void InheritTraitsFromParents(Organ mom, Organ dad) {
+  public void InheritTraitsFromParents(Organ mom, Organ dad, float mutationChance) {
     Dictionary<string, object> myTraits   = TraitValues();
     Dictionary<string, object> momTraits  = mom.TraitValues();
     Dictionary<string, object> dadTraits  = dad.TraitValues();
     foreach (var entry in myTraits) {
       Trait myTrait = entry.Value as Trait;
-      myTrait.Inherit(momTraits[entry.Key] as Trait, dadTraits[entry.Key] as Trait);
+      if (Random.value < mutationChance) {
+        myTrait.Randomize();
+      }
+      else {        
+        myTrait.Inherit(momTraits[entry.Key] as Trait, dadTraits[entry.Key] as Trait);
+      }
     }
   }
 
