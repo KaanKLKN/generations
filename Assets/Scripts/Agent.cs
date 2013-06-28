@@ -5,7 +5,6 @@ using System.Linq;
 
 public class Agent : MonoBehaviour {
 
-  public float speed;
   public float strength;
   public float hunger;
   public float vision;
@@ -33,9 +32,6 @@ public class Agent : MonoBehaviour {
 
   private static float _minEnergy = 0.8F;
   private static float _maxEnergy = 1.0F;
-
-  private static float _minSpeed = 0.5F;
-  private static float _maxSpeed = 4.0F;
 
   private static float _minStrength = 0F;
   private static float _maxStrength = 1F;
@@ -72,7 +68,6 @@ public class Agent : MonoBehaviour {
     //foreach (var entry in reproductiveSystem.InheritableTraitValues())
         //Debug.Log(entry.Key + " : " + entry.Value); 
 
-    speed = Random.Range(_minSpeed, _maxSpeed);
     startingEnergy = Random.Range(_minEnergy, _maxEnergy);
     strength = Random.Range(_minStrength, _maxStrength);
 
@@ -94,15 +89,11 @@ public class Agent : MonoBehaviour {
     hue = Random.Range(parents[0].hue, parents[1].hue);
     //fertility = Random.Range(parents[0].fertility, parents[1].fertility);
 
-    speed = RandomParent(parents).speed;
     startingEnergy = RandomParent(parents).startingEnergy;
     strength = RandomParent(parents).strength;
     hunger = RandomParent(parents).hunger;
     vision = RandomParent(parents).vision;
 
-    if (Random.value < mutationChance) {
-      speed = Random.Range(_minSpeed, _maxSpeed);
-    }
     if (Random.value < mutationChance) {
       startingEnergy = Random.Range(_minEnergy, _maxEnergy);
     }
@@ -266,7 +257,6 @@ public class Agent : MonoBehaviour {
 
     iTween.MoveTo(gameObject, iTween.Hash("position", tile.RandomTop(), "speed", NormalizedSpeed(), "easetype", "linear", "oncomplete", "MoveToTileComplete", "orienttopath", false));
 
-
     if (Random.value < 0.5) {
       reproductiveSystem.ReproduceIfPossible();
     } else {
@@ -390,7 +380,7 @@ public class Agent : MonoBehaviour {
   }
 
   float NormalizedSpeed() {
-    return speed * timeScaleFactor;
+    return body.speed.floatValue * timeScaleFactor;
   }
 
   // Carnivore

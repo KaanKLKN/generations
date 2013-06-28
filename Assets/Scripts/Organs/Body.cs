@@ -6,5 +6,6 @@ using System.Linq;
 public class Body : Organ {
 
   public NumericalTrait lifespan = new NumericalTrait(25, 35); 
+  public NumericalTrait speed = new NumericalTrait(0.5F, 4.0F); 
 
 }
