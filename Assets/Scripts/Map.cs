@@ -46,7 +46,7 @@ public class Map : MonoBehaviour {
     }
 
     // Add a start tile
-    tileTypes[Random.Range(0, size / 4), Random.Range(0, size)] = MapTileType.Start;
+    tileTypes[Random.Range(0, size), Random.Range(0, size)] = MapTileType.Start;
 
     // Add an end tile
     //tileTypes[Random.Range(size - size / 4, size), Random.Range(0, size)] = MapTileType.End;
@@ -65,51 +65,53 @@ public class Map : MonoBehaviour {
     for (int i=0; i < size; i++) {
        for (int j=0; j < size; j++){
 
-        MapTileType type = map[i,j];
-        GameObject prefab = freeTilePrefab;
-        switch (type) {
-           case MapTileType.Free:
-              prefab = freeTilePrefab;
-              break;
-           case MapTileType.Blocked:
-              prefab = blockedTilePrefab;
-              break;
-           case MapTileType.End:
-              prefab = endTilePrefab;
-              break;
-           case MapTileType.Start:
-              prefab = startTilePrefab;
-              break;
-           case MapTileType.Food:
-              prefab = foodTilePrefab;
-              break;
-        }
+          MapTileType type = map[i,j];
+          GameObject prefab = freeTilePrefab;
+          switch (type) {
+             case MapTileType.Free:
+                prefab = freeTilePrefab;
+                break;
+             case MapTileType.Blocked:
+                prefab = blockedTilePrefab;
+                break;
+             case MapTileType.End:
+                prefab = endTilePrefab;
+                break;
+             case MapTileType.Start:
+                prefab = startTilePrefab;
+                break;
+             case MapTileType.Food:
+                prefab = foodTilePrefab;
+                break;
+          }
 
 
-        GameObject tileObject = Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
-        tileObject.name = "Tile (" + i + ", " + j + ")";
-        tileObject.transform.parent = this.transform;
+          GameObject tileObject = Instantiate(prefab, Vector3.zero, Quaternion.identity) as GameObject;
+          tileObject.name = "Tile (" + i + ", " + j + ")";
+          tileObject.transform.parent = this.transform;
 
-        MapTile tile = tileObject.gameObject.GetComponent<MapTile>();
-        tile.map = this;
-        tile.type = type;
-        tile.point = new MapPoint(i, j);
-        tile.height = (float)tileHeightmap[i, j];
-        tile.hue = (float)tileHuemap[i, j];
+          MapTile tile = tileObject.gameObject.GetComponent<MapTile>();
+          tile.map = this;
+          tile.type = type;
+          tile.point = new MapPoint(i, j);
+          tile.height = (float)tileHeightmap[i, j];
+          tile.hue = (float)tileHuemap[i, j];
 
-        tiles[i, j] = tile;
+          tiles[i, j] = tile;
 
-        if (type == MapTileType.Start) {
-          startTile = tile;
-        }
-        else if (type == MapTileType.End) {
-          endTile = tile;
-        }
+          if (type == MapTileType.Start) {
+            startTile = tile;
+          }
+          else if (type == MapTileType.End) {
+            endTile = tile;
+          }
+
+          tile.renderer.enabled = false;
 
        }
     }
 
-    //mapMesh.GenerateFromTiles(tiles);
+    mapMesh.GenerateFromTiles(tiles);
 
   }
 

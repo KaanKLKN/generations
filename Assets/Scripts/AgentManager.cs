@@ -9,6 +9,8 @@ public class AgentManager : MonoBehaviour {
   public int agentsPerGeneration = 50;
   public GameObject agentPrefab;
 
+  public bool placeInGroup = false;
+
   public int populationCeiling = 500;
 
   int livingAgents;
@@ -78,7 +80,12 @@ public class AgentManager : MonoBehaviour {
     agentObject.transform.parent = this.transform;
 
     Agent agent = agentObject.GetComponent<Agent>();
-    agent.currentTile = map.startTile;//map.RandomTile();
+    if (placeInGroup) {
+      agent.currentTile = map.startTile;//map.RandomTile();
+    }
+    else {
+      agent.currentTile = map.RandomTile();
+    }
     agent.manager = this;
 
     currentAgents.Add(agent);

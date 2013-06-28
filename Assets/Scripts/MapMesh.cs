@@ -6,7 +6,7 @@ public class MapMesh : MonoBehaviour {
   public Map map;
 
   Texture2D heightMap;
-  Material material;
+  public Material material;
 
   void  Start (){
     //GenerateHeightmap();
@@ -127,6 +127,8 @@ public class MapMesh : MonoBehaviour {
     // Assign tangents after recalculating normals
     //mesh.tangents = tangents;
     CalculateMeshTangents(mesh);
+
+    GenerateTexture(tiles);
   }
 
   public static void CalculateMeshTangents(Mesh mesh) {
@@ -202,6 +204,43 @@ public class MapMesh : MonoBehaviour {
       }
    
       mesh.tangents = tangents;
+  }
+
+  public void GenerateTexture(MapTile[,] tiles) {
+
+    Texture2D texture = new Texture2D(map.size * 2 - 1, map.size * 2 - 1, TextureFormat.RGB24, true);
+
+    for (int y=0; y < map.size; y++) {
+      for (int x=0; x < map.size; x++) {
+
+        MapTile tile = tiles[x, y];
+        MapTile nextX = null;
+        if (x + 1 < map.size)
+          nextX = tiles[x + 1, y];
+        MapTile nextY = null;
+        if (y + 1 < map.size)
+          nextY = tiles[x, y + 1];
+        MapTile nextBoth = null;
+        if (y + 1 < map.size && x + 1 < map.size)
+          nextBoth = tiles[x + 1, y + 1];
+
+
+        texture.SetPixel(x * 2, y * 2, tile.TileColor());
+        if (nextX != null)
+          texture.SetPixel(x * 2 + 1, y * 2, Color.Lerp(tile.TileColor(), nextX.TileColor(), 0.5F));
+        if (nextBoth != null)
+          texture.SetPixel(x * 2 + 1, y * 2 + 1, Color.Lerp(tile.TileColor(), nextBoth.TileColor(), 0.5F));
+        if (nextY != null)
+          texture.SetPixel(x * 2, y * 2 + 1, Color.Lerp(tile.TileColor(), nextY.TileColor(), 0.5F));
+
+      }
+    }
+
+    texture.Apply();
+
+
+    renderer.material.mainTexture = texture;
+
   }
 
 

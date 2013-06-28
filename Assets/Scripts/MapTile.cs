@@ -39,8 +39,12 @@ public class MapTile : MonoBehaviour {
     SetColorForHeight();
   }
 
+  public Color TileColor() {
+    return new HSBColor(hue, 0.5F, 0.5F + height / 2).ToColor();
+  }
+
   void SetColorForHeight() {
-    SetColor(new HSBColor(hue, 0.6F, height).ToColor());
+    SetColor(TileColor());
   }
 
   public Vector3 Origin() {
