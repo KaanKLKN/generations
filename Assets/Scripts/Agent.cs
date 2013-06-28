@@ -6,9 +6,7 @@ using System.Linq;
 public class Agent : MonoBehaviour {
 
   public float hunger;
-  public float vision;
   public float startingEnergy;
-  public float fertility;
   public float hue;
   public int timesReproduced;
 
@@ -68,7 +66,6 @@ public class Agent : MonoBehaviour {
 
     hue = Random.Range(0F, 1F);
     hunger = Random.Range(0F, 1F);
-    vision = Random.Range(0, 10);
 
     FinishCreating();
   }
@@ -82,11 +79,9 @@ public class Agent : MonoBehaviour {
     body.InheritTraitsFromParents(mom.body, dad.body, mutationChance);
 
     hue = Random.Range(parents[0].hue, parents[1].hue);
-    //fertility = Random.Range(parents[0].fertility, parents[1].fertility);
 
     startingEnergy = RandomParent(parents).startingEnergy;
     hunger = RandomParent(parents).hunger;
-    vision = RandomParent(parents).vision;
 
     if (Random.value < mutationChance) {
       startingEnergy = Random.Range(_minEnergy, _maxEnergy);
@@ -96,9 +91,6 @@ public class Agent : MonoBehaviour {
     }
     if (Random.value < mutationChance) {
       hunger = Random.Range(0F, 1F);
-    }
-    if (Random.value < mutationChance) {
-      vision = Random.Range(0, 10);
     }
 
     FinishCreating();
