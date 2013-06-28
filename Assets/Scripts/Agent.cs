@@ -156,7 +156,12 @@ public class Agent : MonoBehaviour {
       //if (forwardTile != null)
        // MoveToTile(forwardTile);
       //else
-        MoveToTile(nearby[0]);
+      //MoveToTile(nearby[0]);
+    }
+
+    if (nearby.Length > 0) {
+      MoveToTile(nearby[0]);
+      return;
     }
 
     // Decision cost

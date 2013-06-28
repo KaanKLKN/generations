@@ -61,8 +61,8 @@ public class Map : MonoBehaviour {
   void BuildTiles(MapTileType[,] map) {
     tiles = new MapTile[size, size];
 
-    double[,] tileHeightmap = new PlasmaFractalGenerator().Generate(size, size, 50);
-    double[,] tileHuemap = new PlasmaFractalGenerator().Generate(size, size, 50);
+    double[,] tileHeightmap = new PlasmaFractalGenerator().Generate(size, size, Random.Range(0F, 100F));
+    double[,] tileHuemap = new PlasmaFractalGenerator().Generate(size, size, Random.Range(0F, 100F));
 
     for (int i=0; i < size; i++) {
        for (int j=0; j < size; j++){
@@ -107,6 +107,8 @@ public class Map : MonoBehaviour {
           else if (type == MapTileType.End) {
             endTile = tile;
           }
+
+          tile.Setup();
 
           if (!useBoxes)
             tile.renderer.enabled = false;

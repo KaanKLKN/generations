@@ -181,6 +181,10 @@ public class AgentManager : MonoBehaviour {
   }
 
   void OnGUI(){
+    if (GUILayout.Button("New Map")) {
+      Application.LoadLevel ("main");
+    }
+
     GUILayout.BeginHorizontal ("box");
     GUILayout.Label("Spawn generation " + generation);
     GUILayout.EndHorizontal ();
@@ -199,9 +203,6 @@ public class AgentManager : MonoBehaviour {
     GUILayout.Label("Hunger: " + currentHunger + " (" + DeltaString(currentHunger - previousHunger) + ")");
     GUILayout.EndVertical ();
 
-    if (GUILayout.Button("Restart")) {
-      Application.LoadLevel ("main");
-    }
   }
 
     System.String DeltaString(float delta) {

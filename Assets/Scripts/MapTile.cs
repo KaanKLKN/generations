@@ -31,6 +31,10 @@ public class MapTile : MonoBehaviour {
   public float hue;
 
   public virtual void Start() {
+    Setup();
+  }
+
+  public void Setup() {
     if (map != null)
       transform.position = Center();
 
