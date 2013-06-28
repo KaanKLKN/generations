@@ -5,17 +5,16 @@ using System.Linq;
 
 public class Agent : MonoBehaviour {
 
-  public float hunger;
-  public float startingEnergy;
-  public float hue;
   public int timesReproduced;
 
   public float energy;
 
-
+  [HideInInspector]
   public MapTile currentTile;
+  [HideInInspector]
   public MapTile previousTile;
 
+  [HideInInspector]
   public AgentManager manager;
 
   public bool dead;
@@ -26,9 +25,6 @@ public class Agent : MonoBehaviour {
   public static float timeScaleFactor = 1;
 
   private static float mutationChance = 0.05F; // 0-1
-
-  private static float _minEnergy = 0.8F;
-  private static float _maxEnergy = 1.0F;
 
   public ReproductiveSystem reproductiveSystem = new ReproductiveSystem();
   public Body body = new Body();
@@ -55,18 +51,9 @@ public class Agent : MonoBehaviour {
   }
 
   public void CreateRandom() {
-
     foreach (Organ organ in Organs()) {
       organ.RandomizeTraits();
     }
-    //foreach (var entry in reproductiveSystem.InheritableTraitValues())
-        //Debug.Log(entry.Key + " : " + entry.Value); 
-
-    startingEnergy = Random.Range(_minEnergy, _maxEnergy);
-
-    hue = Random.Range(0F, 1F);
-    hunger = Random.Range(0F, 1F);
-
     FinishCreating();
   }
 
@@ -75,36 +62,17 @@ public class Agent : MonoBehaviour {
     Agent mom = parents[0];
     Agent dad = parents[1];
 
-    reproductiveSystem.InheritTraitsFromParents(mom.reproductiveSystem, dad.reproductiveSystem, mutationChance);
     body.InheritTraitsFromParents(mom.body, dad.body, mutationChance);
-
-    hue = Random.Range(parents[0].hue, parents[1].hue);
-
-    startingEnergy = RandomParent(parents).startingEnergy;
-    hunger = RandomParent(parents).hunger;
-
-    if (Random.value < mutationChance) {
-      startingEnergy = Random.Range(_minEnergy, _maxEnergy);
-    }
-    if (Random.value < mutationChance) {
-      hue = Random.Range(0F, 1F);
-    }
-    if (Random.value < mutationChance) {
-      hunger = Random.Range(0F, 1F);
-    }
+    reproductiveSystem.InheritTraitsFromParents(mom.reproductiveSystem, dad.reproductiveSystem, mutationChance);
 
     FinishCreating();
-  }
-
-  Agent RandomParent(Agent[] parents) {
-    return parents[Random.Range(0, parents.Length)];
   }
 
   void FinishCreating() {
     dead = false;
     finished = false;
-    energy = startingEnergy;
-    SetColor(new HSBColor(hue, 1, 1).ToColor());
+    energy = body.startingEnergy.floatValue;
+    SetColor(new HSBColor(body.hue.floatValue, 1, 1).ToColor());
     transform.position = currentTile.CenterTop();
     transform.localScale = transform.localScale + new Vector3(0, Random.Range(-0.1F, 0.1F), 0);
     birthTime = Time.time;
@@ -120,12 +88,10 @@ public class Agent : MonoBehaviour {
       }
     recoloredMaterial.color = color;
   }
-  
 
   public void Notify(AgentNotificationType type) {
     GetComponent<AgentNotifier>().Notify(type);
   }
-
 
   void UpdateAI() {
     if (dead || finished)
@@ -142,7 +108,7 @@ public class Agent : MonoBehaviour {
     // Make a decision based on hunger
     if (IsHungry()) {
       MapTile[] foodspots = currentTile.PassableNeighboringTilesOfTypeForAgent(MapTileType.Food, this);
-      if (foodspots.Length > 0 && Random.value < hunger) {
+      if (foodspots.Length > 0 && Random.value < body.hunger.floatValue) {
         FoodTile foodTile = foodspots[0] as FoodTile;
         if (foodTile.CanConsumeFood(this)) {
           MoveToTile(foodspots[0]);
@@ -249,7 +215,7 @@ public class Agent : MonoBehaviour {
 
   void SetColorToHealth() {
     HSBColor currentColor = new HSBColor(recoloredMaterial.color);
-    currentColor.s = energy;// / startingEnergy;
+    currentColor.s = energy;
     SetColor(currentColor.ToColor());
   }
 
