@@ -14,14 +14,12 @@ public class MapMesh : MonoBehaviour {
 
   public void GenerateFromTiles(MapTile[,] tiles) {
 
-    int tileWidth   = map.size;
-    int tileHeight  = map.size;
+    int mapWidth   = map.size;
+    int mapHeight  = map.size;
+    float tileSize = map.tileSize;
     float padding   = map.tilePadding;
-    float squeeze   = 1 - map.tilePadding;
 
-    Vector3 origin = new Vector3(squeeze, 0, squeeze);
-
-    Vector3 meshSize = new Vector3(tileWidth + tileWidth * padding, map.maxElevation, tileHeight + tileHeight * padding);
+    Vector3 origin = new Vector3(tileSize, 0, tileSize);
 
     // Create the game object containing the renderer
     gameObject.AddComponent<MeshFilter>();
@@ -35,57 +33,41 @@ public class MapMesh : MonoBehaviour {
     // Retrieve a mesh instance
     Mesh mesh = GetComponent<MeshFilter>().mesh;
 
-    int width = tileWidth * 2;
-    int height = tileHeight * 2;
+    int width = mapWidth * 2;
+    int height = mapHeight * 2;
 
-    int y= 0;
-    int x= 0;
+    int y = 0;
+    int x = 0;
 
-    // Convert tiles into vertices;
-    float[,] vertexHeights = new float[width, height];
-
-    for (y=0; y < tileHeight; y++) {
-      for (x=0; x < tileWidth; x++) {
+    // Convert tiles into vertices
+    Vector3[,] rawVertices = new Vector3[width, height];
+    for (y=0; y < mapHeight; y++) {
+      for (x=0; x < mapWidth; x++) {
         MapTile tile = tiles[x, y];
 
-        vertexHeights[x * 2, y * 2] = tile.height;
-        vertexHeights[x * 2 + 1, y * 2] = tile.height;
-        vertexHeights[x * 2 + 1, y * 2 + 1] = tile.height;
-        vertexHeights[x * 2, y * 2 + 1] = tile.height;
+        float h = tile.height * map.maxElevation;
+
+        rawVertices[x*2,      y*2]      = new Vector3(x*padding + (x-1)*tileSize,  h,  y*padding + (y-1)*tileSize);
+        rawVertices[x*2 + 1,  y*2]      = new Vector3(x*padding + x*tileSize,      h,  y*padding + (y-1)*tileSize);
+        rawVertices[x*2,      y*2 + 1]  = new Vector3(x*padding + (x-1)*tileSize,  h,  y*padding + y*tileSize);
+        rawVertices[x*2 + 1,  y*2 + 1]  = new Vector3(x*padding + x*tileSize,      h,  y*padding + y*tileSize);
 
       }
     }
 
-    // Build vertices and UVs
+    // Normalize vertices and create UVs
     Vector3[] vertices= new Vector3[height * width];
     Vector2[] uv= new Vector2[height * width];
-    Vector4[] tangents= new Vector4[height * width];
     
     Vector2 uvScale = new Vector2 (1.0f / (width - 1), 1.0f / (height - 1));
-
-    Vector3 sizeScale = new Vector3 (meshSize.x / width, meshSize.y, meshSize.z / height);
     
     for (y=0; y < height; y++) {
       for (x=0; x < width; x++) {
 
-        float desiredX = x;
-        float desiredY = y;
+        Vector3 vertex = rawVertices[x, y];
+        vertices[y * width + x] = origin + vertex;
 
-        if (x % 2 == 0) {
-          desiredX = x - squeeze;
-        }
-        if (y % 2 == 0) {
-          desiredY = y - squeeze;
-        }
-
-        desiredX += origin.x;
-        desiredY += origin.z;
-
-        float pixelHeight = vertexHeights[x, y]; //heightMap.GetPixel(x, y).grayscale;
-        Vector3 vertex= new Vector3 (desiredX, pixelHeight, desiredY);
-        vertices[y*width + x] = Vector3.Scale(sizeScale, vertex);
-
-        uv[y * width + x] = Vector2.Scale(new Vector2 (desiredX, desiredY), uvScale);
+        uv[y * width + x] = Vector2.Scale(new Vector2(vertex.x, vertex.z), uvScale);
 
         // Calculate tangent vector: a vector that goes from previous vertex
         // to next along X direction. We need tangents if we intend to
@@ -125,7 +107,6 @@ public class MapMesh : MonoBehaviour {
     mesh.Optimize();
     
     // Assign tangents after recalculating normals
-    //mesh.tangents = tangents;
     CalculateMeshTangents(mesh);
 
     GenerateTexture(tiles);
@@ -209,6 +190,7 @@ public class MapMesh : MonoBehaviour {
   public void GenerateTexture(MapTile[,] tiles) {
 
     Texture2D texture = new Texture2D(map.size * 2 - 1, map.size * 2 - 1, TextureFormat.RGB24, true);
+    texture.wrapMode = TextureWrapMode.Clamp;
 
     for (int y=0; y < map.size; y++) {
       for (int x=0; x < map.size; x++) {
@@ -237,7 +219,6 @@ public class MapMesh : MonoBehaviour {
     }
 
     texture.Apply();
-
 
     renderer.material.mainTexture = texture;
 

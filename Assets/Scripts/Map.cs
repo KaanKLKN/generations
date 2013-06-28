@@ -8,6 +8,8 @@ public class Map : MonoBehaviour {
   public float tileSize = 1;
   public float maxElevation = 4;
 
+  public bool useBoxes = false;
+
   public GameObject startTilePrefab;
   public GameObject endTilePrefab;
   public GameObject freeTilePrefab;
@@ -106,13 +108,16 @@ public class Map : MonoBehaviour {
             endTile = tile;
           }
 
-          tile.renderer.enabled = false;
+          if (!useBoxes)
+            tile.renderer.enabled = false;
 
        }
     }
 
     mapMesh.GenerateFromTiles(tiles);
 
+    if (useBoxes)
+      mapMesh.transform.position -= new Vector3(0, 0.1F, 0);
   }
 
   public MapTile RandomTile() {
