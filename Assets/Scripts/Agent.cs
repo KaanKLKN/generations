@@ -6,11 +6,12 @@ using System.Linq;
 public class Agent : MonoBehaviour {
 
   public float speed;
-  public float freeWill;
+  public float strength;
   public float hunger;
   public float vision;
   public float startingEnergy;
   public float lifespan;
+  public float fertility;
   public float hue;
   public int timesReproduced;
 
@@ -40,12 +41,36 @@ public class Agent : MonoBehaviour {
   private static float _minSpeed = 0.5F;
   private static float _maxSpeed = 4.0F;
 
+  private static float _minStrength = 0F;
+  private static float _maxStrength = 1F;
+
+  public ReproductiveSystem reproductiveSystem = new ReproductiveSystem();
+  public int timesEaten = 0;
+
+  public Organ[] Organs() {
+    return new Organ[] {reproductiveSystem};
+  }
+
+  public void InitializeAgent() {
+    foreach (Organ organ in Organs()) {
+      organ.agent = this;
+    }
+  }
+
   public void CreateRandom() {
+
+    foreach (Organ organ in Organs()) {
+      organ.RandomizeTraits();
+    }
+    //foreach (var entry in reproductiveSystem.InheritableTraitValues())
+        //Debug.Log(entry.Key + " : " + entry.Value); 
+
     speed = Random.Range(_minSpeed, _maxSpeed);
     startingEnergy = Random.Range(_minEnergy, _maxEnergy);
     lifespan = Random.Range(_minLifespan, _maxLifespan);
+    strength = Random.Range(_minStrength, _maxStrength);
+
     hue = Random.Range(0F, 1F);
-    freeWill = Random.Range(0F, 1F);
     hunger = Random.Range(0F, 1F);
     vision = Random.Range(0, 10);
 
@@ -54,11 +79,17 @@ public class Agent : MonoBehaviour {
 
   public void CreateFromParents(Agent[] parents) {
 
+    Agent mom = parents[0];
+    Agent dad = parents[1];
+
+    reproductiveSystem.InheritTraitsFromParents(mom.reproductiveSystem, dad.reproductiveSystem);
+
     hue = Random.Range(parents[0].hue, parents[1].hue);
+    //fertility = Random.Range(parents[0].fertility, parents[1].fertility);
 
     speed = RandomParent(parents).speed;
     startingEnergy = RandomParent(parents).startingEnergy;
-    freeWill = RandomParent(parents).freeWill;
+    strength = RandomParent(parents).strength;
     hunger = RandomParent(parents).hunger;
     vision = RandomParent(parents).vision;
     lifespan = RandomParent(parents).lifespan;
@@ -73,7 +104,7 @@ public class Agent : MonoBehaviour {
       lifespan = Random.Range(_minLifespan, _maxLifespan);
     }
     if (Random.value < mutationChance) {
-      freeWill = Random.Range(0F, 1F);
+      strength = Random.Range(_minStrength, _maxStrength);
     }
     if (Random.value < mutationChance) {
       hue = Random.Range(0F, 1F);
@@ -114,7 +145,7 @@ public class Agent : MonoBehaviour {
   }
   
 
-  void Notify(AgentNotificationType type) {
+  public void Notify(AgentNotificationType type) {
     GetComponent<AgentNotifier>().Notify(type);
   }
 
@@ -143,29 +174,9 @@ public class Agent : MonoBehaviour {
       }
     }
 
-    if (Random.value < freeWill) {
-      // Make a crazy decision
-      MapTile[] rejectedNearby = RejectPreviousTiles(nearby);
-      MapTile randomTile = rejectedNearby[Random.Range(0, rejectedNearby.Length)];
-      MoveToTile(randomTile);
-    }
-    else {
-      // Fit in
-      //MapTile[] inDirection = RejectPreviousTiles(currentTile.NeighboringTilesClosestTo(manager.map.endTile));
-      //MapTile forwardTile = currentTile.NeighboringTileInDirection(CurrentDirection());
-      //if (forwardTile != null)
-       // MoveToTile(forwardTile);
-      //else
-      //MoveToTile(nearby[0]);
-    }
-
-    if (nearby.Length > 0) {
-      MoveToTile(nearby[0]);
-      return;
-    }
-
-    // Decision cost
-    //energy -= 0.01F;
+    MapTile[] rejectedNearby = RejectPreviousTiles(nearby);
+    MapTile randomTile = rejectedNearby[Random.Range(0, rejectedNearby.Length)];
+    MoveToTile(randomTile);
 
   }
 
@@ -202,6 +213,7 @@ public class Agent : MonoBehaviour {
           energy = 1;
         manager.IncrementCounter("Ate", 1);
         Notify(AgentNotificationType.Ate);
+        timesEaten++;
       }
     }
   }
@@ -251,7 +263,12 @@ public class Agent : MonoBehaviour {
 
     iTween.MoveTo(gameObject, iTween.Hash("position", tile.RandomTop(), "speed", NormalizedSpeed(), "easetype", "linear", "oncomplete", "MoveToTileComplete", "orienttopath", false));
 
-    ReproduceIfPossible();
+
+    if (Random.value < 0.5) {
+      reproductiveSystem.ReproduceIfPossible();
+    } else {
+      EatAgentIfPossible();
+    }
   }
 
   void SetColorToHealth() {
@@ -292,14 +309,10 @@ public class Agent : MonoBehaviour {
         return;
 
       if (energy <= 0F) {
-        manager.IncrementCounter("Died", 1);
-        manager.IncrementCounter("Died of Starvation", 1);
-        Die();
+        Starve();
       }
       else if (LifeRemaining() <= 0F) {
-        manager.IncrementCounter("Died", 1);
-        manager.IncrementCounter("Died of Old Age", 1);
-        Die();
+        DieOfOldAge();
       }
     }
 
@@ -307,8 +320,28 @@ public class Agent : MonoBehaviour {
 
   public float fitness;
 
-  void Die() {
+  void Starve() {
     Notify(AgentNotificationType.Death);
+    manager.IncrementCounter("Died", 1);
+    manager.IncrementCounter("Died of Starvation", 1);
+    Die();
+  }
+
+  void DieOfOldAge() {
+    Notify(AgentNotificationType.Death);
+    manager.IncrementCounter("Died", 1);
+    manager.IncrementCounter("Died of Old Age", 1);
+    Die();
+  }
+
+  void BeMurdered() {
+    Notify(AgentNotificationType.Murder);
+    manager.IncrementCounter("Died", 1);
+    manager.IncrementCounter("Eaten", 1);
+    Die();
+  }
+
+  void Die() {
 
     deathTime = Time.time;
     dead = true;
@@ -357,67 +390,39 @@ public class Agent : MonoBehaviour {
     return speed * timeScaleFactor;
   }
 
-  // Reproduction
+  // Carnivore
 
-  static float reproductionCost = 0.1F;
-  static float reproductionThreshold = 0.5F;
-  static int maxChildren = 4;
-
-  public bool CanReproduce() {
-    // && LifeRemainingPercent() < 0.8
-    if (!manager.PopulationCeilingExceeded() && energy > reproductionThreshold && timesReproduced < maxChildren) {
-      return true;
-    }
-    return false;
-  }
-
-  public void ReproduceIfPossible() {
-    if (CanReproduce()) {
-      // Find other agents
-      Agent[] otherAgents = currentTile.AgentsHereExcluding(this);
-      if (otherAgents.Length > 0) {
-        Agent[] fertileAgents = SelectFertileAgents(otherAgents);
-        if (fertileAgents.Length > 0) {
-          ReproduceWith(fertileAgents[0]);          
-        }
+  public void EatAgentIfPossible() {
+    Agent[] otherAgents = currentTile.AgentsHereExcluding(this);
+    if (otherAgents.Length > 0) {
+      Agent[] weakerAgents = SelectWeakerAgents(otherAgents);
+      if (weakerAgents.Length > 0) {
+        EatAgent(weakerAgents[Random.Range(0, weakerAgents.Length)]);          
       }
     }
   }
 
-  public Agent[] SelectFertileAgents(Agent[] agents) {
+  public void EatAgent(Agent prey) {
+
+    energy += prey.energy;
+    if (energy > 1)
+      energy = 1;
+
+    manager.IncrementCounter("Ate", 1);
+
+    timesEaten++;
+
+    prey.BeMurdered();
+
+  }
+
+  public Agent[] SelectWeakerAgents(Agent[] agents) {
     ArrayList fertile = new ArrayList();
     foreach (Agent agent in agents) {
-        if (agent.CanReproduce())
+        if (agent.strength < strength)
             fertile.Add(agent);
     }
     return fertile.ToArray( typeof( Agent ) ) as Agent[];
-  }
-
-  public Agent ReproduceWith(Agent otherParent) {
-
-    energy -= reproductionCost;
-    timesReproduced++;
-    otherParent.energy -= reproductionCost;
-    otherParent.timesReproduced++;
-
-    Agent child = manager.BirthAgent();
-
-    child.currentTile = currentTile;
-
-    Agent[] parents = new Agent[2];
-    parents[0] = this;
-    parents[1] = otherParent;
-    child.CreateFromParents(parents);
-
-    child.energy = reproductionThreshold;
-
-    manager.IncrementCounter("Reproduced", 1);
-    Notify(AgentNotificationType.Sex);
-    otherParent.Notify(AgentNotificationType.Sex);
-
-    child.Notify(AgentNotificationType.Birth);
-
-    return child;
   }
 
 }

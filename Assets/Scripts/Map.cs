@@ -38,7 +38,7 @@ public class Map : MonoBehaviour {
         float val = Random.value;
         MapTileType type = MapTileType.Free;
 
-        if (val < 0.1) {
+        if (val < 0.05) {
           type = MapTileType.Food;
         }
 

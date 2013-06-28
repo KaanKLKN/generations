@@ -80,13 +80,14 @@ public class AgentManager : MonoBehaviour {
     agentObject.transform.parent = this.transform;
 
     Agent agent = agentObject.GetComponent<Agent>();
+    agent.InitializeAgent();
+    agent.manager = this;
     if (placeInGroup) {
       agent.currentTile = map.startTile;//map.RandomTile();
     }
     else {
       agent.currentTile = map.RandomTile();
     }
-    agent.manager = this;
 
     currentAgents.Add(agent);
     livingAgents++;
@@ -157,26 +158,19 @@ public class AgentManager : MonoBehaviour {
   float previousSpeed;
   float currentSpeed;
 
-  float previousFreeWill;
-  float currentFreeWill;
-
   float previousHunger;
   float currentHunger;
 
   void CalculateAverages() {
     previousSpeed = currentSpeed;
     currentSpeed = 0;
-    previousFreeWill = currentFreeWill;
-    currentFreeWill = 0;
     previousHunger = currentHunger;
     currentHunger = 0;
     foreach(Agent agent in currentAgents) {
       currentSpeed += agent.speed;
-      currentFreeWill += agent.freeWill;
       currentHunger += agent.hunger;
     }
     currentSpeed = currentSpeed / agentsPerGeneration;
-    currentFreeWill = currentFreeWill / agentsPerGeneration;
     currentHunger = currentHunger / agentsPerGeneration;
   }
 
@@ -199,7 +193,6 @@ public class AgentManager : MonoBehaviour {
     GUILayout.BeginVertical ("box");
     GUILayout.Label("Averages:");
     GUILayout.Label("Speed: " + currentSpeed + " (" + DeltaString(currentSpeed - previousSpeed) + ")");
-    GUILayout.Label("Free Will: " + currentFreeWill + " (" + DeltaString(currentFreeWill - previousFreeWill) + ")");
     GUILayout.Label("Hunger: " + currentHunger + " (" + DeltaString(currentHunger - previousHunger) + ")");
     GUILayout.EndVertical ();
 

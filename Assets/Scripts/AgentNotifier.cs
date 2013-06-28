@@ -5,6 +5,7 @@ public enum AgentNotificationType {
   Sex,
   Birth,
   Death,
+  Murder,
   Ate
 }
 
@@ -17,6 +18,7 @@ public class AgentNotifier : MonoBehaviour {
   public Texture2D birthTexture;
   public Texture2D deathTexture;
   public Texture2D ateTexture;
+  public Texture2D murderedTexture;
 
   GameObject _notifierPlane;
   Material _myMaterial;
@@ -63,12 +65,15 @@ public class AgentNotifier : MonoBehaviour {
     else if (type == AgentNotificationType.Ate) {
       _myMaterial.mainTexture = ateTexture;
     }
+    else if (type == AgentNotificationType.Murder) {
+      _myMaterial.mainTexture = murderedTexture;
+    }
 
     _notifierPlane.renderer.enabled = true;
 
-    Vector3 destination = new Vector3(0, 2, 0);
+    Vector3 destination = new Vector3(0, 4, 0);
 
-    iTween.ScaleTo(_notifierPlane, new Vector3(4, 4, 4), notificationDuration);
+    iTween.ScaleTo(_notifierPlane, new Vector3(7, 7, 7), notificationDuration);
     iTween.MoveTo(_notifierPlane, iTween.Hash("position", destination, "time", notificationDuration, "oncomplete", "NotifyDone", "islocal", true));
 
     StartCoroutine(NotifyDone());
