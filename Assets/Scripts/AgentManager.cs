@@ -55,17 +55,8 @@ public class AgentManager : MonoBehaviour {
     finishedAgents = 0;
 
     for (int i=0; i < agentsPerGeneration; i++) {
-      
         Agent agent = BirthAgent();
-        if (generation < 2) {
-          agent.CreateRandom();
-        }
-        else {
-          Agent[] parents = new Agent[2];
-          parents[0] = previousAgents[Random.Range(0, previousAgents.Length)];
-          parents[1] = previousAgents[Random.Range(0, previousAgents.Length)];
-          agent.CreateFromParents(parents);
-        }
+        agent.CreateRandom();
     }
 
   }
@@ -118,7 +109,8 @@ public class AgentManager : MonoBehaviour {
 
   void CheckGenerationComplete() {
     if (LivingAgents() <= 0) {
-      StartCoroutine(SelectFittestAndBeginNewGeneration());
+      Generate(null);
+      //StartCoroutine(SelectFittestAndBeginNewGeneration());
     }
   }
 

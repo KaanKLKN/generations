@@ -18,7 +18,7 @@ public class ReproductiveSystem : Organ {
 
   public bool CanReproduce() {
     if (!agent.manager.PopulationCeilingExceeded()
-        && agent.timesEaten > 1 
+        && agent.hungerCenter.timesEaten > 1 
         && agent.energy > reproductionThreshold 
         && timesReproduced < maxChildren) {
       return true;

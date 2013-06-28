@@ -1,0 +1,95 @@
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+
+public class HungerCenter : Organ {
+
+  public NumericalTrait hunger = new NumericalTrait(0, 1); 
+
+  public int timesEaten = 0;
+
+  // Generic Methods
+
+  bool IsHungry() {
+    return agent.energy < 0.75;
+  }
+
+  public void EatFoodAmount(float energyAmount) {
+    agent.energy += energyAmount;
+    if (agent.energy > 1)
+      agent.energy = 1;
+    agent.manager.IncrementCounter("Ate Food", 1);
+    agent.Notify(AgentNotificationType.Ate);
+    timesEaten++;
+  }
+
+  // AI Hooks
+
+  // Return true to prevent any other action by the AI this turn.
+  public AIDecisionType MakeHungerDecision() {
+    if (IsHungry()) {
+      if (agent.currentTile.type == MapTileType.Food) {
+        EatFoodTile();
+        return AIDecisionType.ShareTurn;
+      }
+      else if (HeadForFoodTile()) {
+        return AIDecisionType.ConsumeTurn;
+      }
+      else if (EatAgentIfPossible()) {
+        return AIDecisionType.ShareTurn;
+      }
+    }
+    return AIDecisionType.NoDecision;
+  }
+
+  // Food Tiles / Herbivores
+
+  bool HeadForFoodTile() {
+    FoodTile[] foodTiles = agent.currentTile.PassableNeighboringTilesOfTypeForAgent(MapTileType.Food, agent) as FoodTile[];
+    if (foodTiles != null && foodTiles.Length > 0) {
+      FoodTile foodTile = foodTiles[Random.Range(0, foodTiles.Length)] as FoodTile;
+      if (foodTile.CanConsumeFood(agent)) {
+        agent.MoveToTile(foodTile);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public void EatFoodTile() {
+    FoodTile foodTile = agent.currentTile as FoodTile;
+    if (IsHungry() && foodTile.ConsumeFood(agent)) {
+      EatFoodAmount(foodTile.foodEnergy);
+    }
+  }
+
+  // Carnivore
+
+  public bool EatAgentIfPossible() {
+    Agent[] otherAgents = agent.currentTile.AgentsHereExcluding(agent);
+    if (otherAgents.Length > 0) {
+      Agent[] weakerAgents = SelectWeakerAgents(otherAgents);
+      if (weakerAgents.Length > 0) {
+        EatAgent(weakerAgents[Random.Range(0, weakerAgents.Length)]);
+        return true;          
+      }
+    }
+    return false;
+  }
+
+  public void EatAgent(Agent prey) {
+    EatFoodAmount(prey.energy);
+    prey.BeMurdered();
+  }
+
+  public Agent[] SelectWeakerAgents(Agent[] agentList) {
+    ArrayList fertile = new ArrayList();
+    foreach (Agent testAgent in agentList) {
+        if (testAgent.body.strength.floatValue < agent.body.strength.floatValue)
+            fertile.Add(testAgent);
+    }
+    return fertile.ToArray( typeof( Agent ) ) as Agent[];
+  }
+
+}

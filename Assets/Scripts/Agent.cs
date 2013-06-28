@@ -3,6 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+public enum AIDecisionType {
+  ConsumeTurn,
+  ShareTurn,
+  NoDecision
+}
+
 public class Agent : MonoBehaviour {
 
   public int timesReproduced;
@@ -26,12 +32,12 @@ public class Agent : MonoBehaviour {
 
   private static float mutationChance = 0.05F; // 0-1
 
-  public ReproductiveSystem reproductiveSystem = new ReproductiveSystem();
   public Body body = new Body();
-  public int timesEaten = 0;
+  public ReproductiveSystem reproductiveSystem = new ReproductiveSystem();
+  public HungerCenter hungerCenter = new HungerCenter();
 
   public Organ[] Organs() {
-    return new Organ[] {reproductiveSystem, body};
+    return new Organ[] {reproductiveSystem, body, hungerCenter};
   }
 
   public Dictionary<string, Trait> Traits() {
@@ -64,6 +70,7 @@ public class Agent : MonoBehaviour {
 
     body.InheritTraitsFromParents(mom.body, dad.body, mutationChance);
     reproductiveSystem.InheritTraitsFromParents(mom.reproductiveSystem, dad.reproductiveSystem, mutationChance);
+    hungerCenter.InheritTraitsFromParents(mom.hungerCenter, dad.hungerCenter, mutationChance);
 
     FinishCreating();
   }
@@ -106,20 +113,19 @@ public class Agent : MonoBehaviour {
     }
 
     // Make a decision based on hunger
-    if (IsHungry()) {
-      MapTile[] foodspots = currentTile.PassableNeighboringTilesOfTypeForAgent(MapTileType.Food, this);
-      if (foodspots.Length > 0 && Random.value < body.hunger.floatValue) {
-        FoodTile foodTile = foodspots[0] as FoodTile;
-        if (foodTile.CanConsumeFood(this)) {
-          MoveToTile(foodspots[0]);
-          return;
-        }
-      }
+    if (hungerCenter.MakeHungerDecision() == AIDecisionType.ConsumeTurn) {
+      return;
+    }
+
+    if (Random.value < 0.5) {
+      reproductiveSystem.ReproduceIfPossible();
     }
 
     MapTile[] rejectedNearby = RejectPreviousTiles(nearby);
-    MapTile randomTile = rejectedNearby[Random.Range(0, rejectedNearby.Length)];
-    MoveToTile(randomTile);
+    if (rejectedNearby.Length > 0) {
+      MapTile randomTile = rejectedNearby[Random.Range(0, rejectedNearby.Length)];
+      MoveToTile(randomTile);      
+    }
 
   }
 
@@ -132,33 +138,7 @@ public class Agent : MonoBehaviour {
   void MoveToTileComplete() {
     if (dead || finished)
       return;
-
-    if (currentTile.type == MapTileType.Food) {
-      EatFoodTile();
-    }
-    else if (currentTile.type == MapTileType.End) {
-      Finish();
-    }
-
     UpdateAI();
-  }
-
-  bool IsHungry() {
-    return energy < 0.75;
-  }
-
-  void EatFoodTile() {
-    FoodTile food = currentTile as FoodTile;
-    if (IsHungry()) {
-      if (food.ConsumeFood(this)) {
-        energy += food.foodEnergy;
-        if (energy > 1)
-          energy = 1;
-        manager.IncrementCounter("Ate", 1);
-        Notify(AgentNotificationType.Ate);
-        timesEaten++;
-      }
-    }
   }
 
   MapTile[] RejectPreviousTiles(MapTile[] tiles) {
@@ -195,7 +175,7 @@ public class Agent : MonoBehaviour {
     lockedOutTiles.Add(tile);
   }
 
-  void MoveToTile(MapTile tile) {
+  public void MoveToTile(MapTile tile) {
 
     previousTile = currentTile;
     if (previousTile != null)
@@ -205,12 +185,6 @@ public class Agent : MonoBehaviour {
     currentTile.AgentDidEnter(this);
 
     iTween.MoveTo(gameObject, iTween.Hash("position", tile.RandomTop(), "speed", NormalizedSpeed(), "easetype", "linear", "oncomplete", "MoveToTileComplete", "orienttopath", false));
-
-    if (Random.value < 0.5) {
-      reproductiveSystem.ReproduceIfPossible();
-    } else {
-      EatAgentIfPossible();
-    }
   }
 
   void SetColorToHealth() {
@@ -276,7 +250,7 @@ public class Agent : MonoBehaviour {
     Die();
   }
 
-  void BeMurdered() {
+  public void BeMurdered() {
     Notify(AgentNotificationType.Murder);
     manager.IncrementCounter("Died", 1);
     manager.IncrementCounter("Eaten", 1);
@@ -330,41 +304,6 @@ public class Agent : MonoBehaviour {
 
   float NormalizedSpeed() {
     return body.speed.floatValue * timeScaleFactor;
-  }
-
-  // Carnivore
-
-  public void EatAgentIfPossible() {
-    Agent[] otherAgents = currentTile.AgentsHereExcluding(this);
-    if (otherAgents.Length > 0) {
-      Agent[] weakerAgents = SelectWeakerAgents(otherAgents);
-      if (weakerAgents.Length > 0) {
-        EatAgent(weakerAgents[Random.Range(0, weakerAgents.Length)]);          
-      }
-    }
-  }
-
-  public void EatAgent(Agent prey) {
-
-    energy += prey.energy;
-    if (energy > 1)
-      energy = 1;
-
-    manager.IncrementCounter("Ate", 1);
-
-    timesEaten++;
-
-    prey.BeMurdered();
-
-  }
-
-  public Agent[] SelectWeakerAgents(Agent[] agents) {
-    ArrayList fertile = new ArrayList();
-    foreach (Agent agent in agents) {
-        if (agent.body.strength.floatValue < body.strength.floatValue)
-            fertile.Add(agent);
-    }
-    return fertile.ToArray( typeof( Agent ) ) as Agent[];
   }
 
 }
