@@ -42,3 +42,29 @@ public class NumericalTrait : Trait {
   }
 
 }
+
+public class BooleanTrait : Trait {
+
+  public bool boolValue;
+  public float floatValue;
+
+  public void SetValue(bool value) {
+    boolValue = value;
+    floatValue = value ? 1 : 0;
+  }
+
+  public override void Randomize() {
+    base.Randomize();
+    SetValue(Random.value > 0.5F);
+  }
+
+  public override void Inherit(Trait trait1, Trait trait2) {
+    BooleanTrait bt1 = trait1 as BooleanTrait;
+    BooleanTrait bt2 = trait2 as BooleanTrait;
+    if (bt1.boolValue == bt2.boolValue)
+      SetValue(bt1.boolValue);
+    else
+      Randomize();
+  }
+
+}

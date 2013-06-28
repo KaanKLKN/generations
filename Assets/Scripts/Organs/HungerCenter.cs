@@ -5,7 +5,9 @@ using System.Linq;
 
 public class HungerCenter : Organ {
 
-  public NumericalTrait hunger = new NumericalTrait(0, 1); 
+  public NumericalTrait hunger  = new NumericalTrait(0, 1); 
+  public BooleanTrait carnivore = new BooleanTrait(); 
+  public BooleanTrait herbivore = new BooleanTrait(); 
 
   public int timesEaten = 0;
 
@@ -29,14 +31,14 @@ public class HungerCenter : Organ {
   // Return true to prevent any other action by the AI this turn.
   public AIDecisionType MakeHungerDecision() {
     if (IsHungry()) {
-      if (agent.currentTile.type == MapTileType.Food) {
+      if (herbivore.boolValue && agent.currentTile.type == MapTileType.Food) {
         EatFoodTile();
         return AIDecisionType.ShareTurn;
       }
-      else if (HeadForFoodTile()) {
+      else if (herbivore.boolValue && HeadForFoodTile()) {
         return AIDecisionType.ConsumeTurn;
       }
-      else if (EatAgentIfPossible()) {
+      else if (carnivore.boolValue && EatAgentIfPossible()) {
         return AIDecisionType.ShareTurn;
       }
     }

@@ -137,6 +137,8 @@ public class MapTile : MonoBehaviour {
 
   public Agent[] AgentsHereExcluding(Agent excludedAgent) {
     ArrayList others = new ArrayList();
+    if (here == null)
+        here = new ArrayList();
     foreach (Agent otherAgent in here) {
         if (otherAgent != excludedAgent)
             others.Add(otherAgent);

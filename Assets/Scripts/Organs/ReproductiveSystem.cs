@@ -8,19 +8,20 @@ public class ReproductiveSystem : Organ {
   public NumericalTrait fertility = new NumericalTrait(0F, 1F); 
 
   int timesReproduced = 0;
-  static int _maximumChildren = 10;
 
   // Reproduction
 
   static float reproductionCost = 0.1F;
   static float reproductionThreshold = 0.5F;
-  static int maxChildren = 4;
+
+  static int _maxTotalChildren = 10;
+  static int _maxLitterSize = 5;
 
   public bool CanReproduce() {
     if (!agent.manager.PopulationCeilingExceeded()
-        && agent.hungerCenter.timesEaten > 1 
+        //&& agent.hungerCenter.timesEaten > 1 
         && agent.energy > reproductionThreshold 
-        && timesReproduced < maxChildren) {
+        && timesReproduced < _maxTotalChildren) {
       return true;
     }
     return false;
@@ -50,14 +51,14 @@ public class ReproductiveSystem : Organ {
 
   public Agent[] ReproduceWith(Agent otherParent) {
 
-    if (Random.value <= fertility.floatValue 
-        && Random.value <= otherParent.reproductiveSystem.fertility.floatValue) {
+    /*if (Random.value <= fertility.floatValue 
+        || Random.value <= otherParent.reproductiveSystem.fertility.floatValue) {
       return new Agent[0];
     }
-
-    int kidsToHave = Mathf.RoundToInt(
-        Random.Range(_maximumChildren * fertility.floatValue,
-                     _maximumChildren * otherParent.reproductiveSystem.fertility.floatValue)
+    */
+    int kidsToHave = Mathf.CeilToInt(
+        Random.Range(_maxLitterSize * fertility.floatValue,
+                     _maxLitterSize * otherParent.reproductiveSystem.fertility.floatValue)
         );
 
     Agent[] children = new Agent[kidsToHave];
