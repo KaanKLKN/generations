@@ -3,6 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+public struct TraitStatistic {
+   public string name;
+   public float floatValue;
+   public Trait trait;
+   public TraitStatistic(string n, float value, Trait t) 
+   {
+      floatValue = value;
+      name = n;
+      trait = t;
+   }
+}
+
 public class AgentManager : MonoBehaviour {
 
   public Map map;
@@ -81,7 +93,7 @@ public class AgentManager : MonoBehaviour {
 
     currentAgents.Add(agent);
     livingAgents++;
-    CalculateTraitAverages();
+    DidUpdateTraits();
 
     return agent;
   }
@@ -96,7 +108,7 @@ public class AgentManager : MonoBehaviour {
     livingAgents -= 1;
     CheckGenerationComplete();
     currentAgents.Remove(deadAgent);
-    CalculateTraitAverages();
+    DidUpdateTraits();
   }
 
   int LivingAgents() {
@@ -149,26 +161,48 @@ public class AgentManager : MonoBehaviour {
     counters[name] = value + incrementAmount;
   }
 
-  Dictionary<string, float> traitAverages = new Dictionary<string, float>();
+  ArrayList traitAverages = new ArrayList();
+
+  bool _needsTraitUpdate = false;
+  float _lastTraitUpdate = 0;
+  public void DidUpdateTraits() {
+    _needsTraitUpdate = true;
+  }
 
   public void CalculateTraitAverages() {
-    Dictionary<string, float> traitSums = new Dictionary<string, float>();
-    foreach (Agent agent in currentAgents) {
-      foreach (var pair in agent.Traits()) {
-        NumericalTrait trait = pair.Value as NumericalTrait;
-        if (trait != null) {
-          float value;
-          if (!traitSums.TryGetValue(pair.Key, out value)) {
-            value = 0;
+    ArrayList _currentAgents = currentAgents;
+
+      var traitSums = new Dictionary<string, TraitStatistic>();
+      foreach (Agent agent in _currentAgents) {
+        foreach (var pair in agent.Traits()) {
+          NumericalTrait trait = pair.Value as NumericalTrait;
+          if (trait != null) {
+            TraitStatistic statistic;
+            if (!traitSums.TryGetValue(pair.Key, out statistic)) {
+              statistic = new TraitStatistic(pair.Key, 0, trait);
+            }
+            traitSums[pair.Key] = new TraitStatistic(pair.Key, statistic.floatValue + trait.floatValue, trait);
           }
-          traitSums[pair.Key] = value + trait.floatValue;
         }
       }
-    }
 
-    foreach (var pair in traitSums) {
-      traitAverages[pair.Key] = pair.Value / currentAgents.Count;
-    }
+      ArrayList newTraits = new ArrayList();
+
+      foreach (KeyValuePair<string, TraitStatistic>pair in traitSums) {
+        TraitStatistic statistic = pair.Value;
+        statistic.floatValue = statistic.floatValue / _currentAgents.Count;
+        newTraits.Add(statistic);
+      }
+
+      traitAverages = newTraits;
+      _needsTraitUpdate = false;
+      _lastTraitUpdate = Time.time;
+
+  }
+
+  void FixedUpdate() {
+    if (_needsTraitUpdate && _lastTraitUpdate < Time.time - 0.5)
+      CalculateTraitAverages();
   }
 
   void OnGUI(){
@@ -189,8 +223,8 @@ public class AgentManager : MonoBehaviour {
 
     GUILayout.BeginVertical ("box");
     GUILayout.Label("INHERITED TRAITS");
-    foreach(var average in traitAverages) {
-      GUILayout.Label(average.Key + ": " + average.Value);
+    foreach(TraitStatistic statistic in traitAverages) {
+      GUILayout.Label(statistic.name + ": " + statistic.floatValue);
     }
     GUILayout.EndVertical ();
 
