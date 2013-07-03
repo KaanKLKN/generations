@@ -209,7 +209,7 @@ public class Agent : MonoBehaviour {
   }
 
   float TimeToDieOfHunger() {
-    return (body.lifespan.floatValue / timeScaleFactor) * 0.5F;
+    return (body.lifespan.floatValue / timeScaleFactor) * 0.75F;
   }
 
   void Update() {
