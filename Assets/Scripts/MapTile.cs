@@ -158,11 +158,13 @@ public class MapTile : MonoBehaviour {
   }
 
   void OnDrawGizmosSelected() {
-    Gizmos.color = Color.red;
-    DrawSelectedGizmo();
-    Gizmos.color = Color.green;
-    foreach (MapTile passableNeighbor in PassableNeighboringTilesForAgent(null)) {
-      passableNeighbor.DrawSelectedGizmo();
+    if (map != null) {
+      Gizmos.color = Color.red;
+      DrawSelectedGizmo();
+      Gizmos.color = Color.green;
+      foreach (MapTile passableNeighbor in PassableNeighboringTilesForAgent(null)) {
+        passableNeighbor.DrawSelectedGizmo();
+      }      
     }
   }
 

@@ -7,6 +7,8 @@ public class FoodTile : MapTile {
   public float foodEnergy = 1F;
   public float replenishTime = 2;
 
+  public GameObject foodObjectPrefab;
+
   public int availableFood;
 
   public bool CanConsumeFood(Agent agent) {
@@ -41,6 +43,7 @@ public class FoodTile : MapTile {
     else {
       SetColor(Color.red);
     }
+    DisplayFoodObjects();
   }
 
   void OutOfFood() {
@@ -54,6 +57,27 @@ public class FoodTile : MapTile {
     availableFood = startingFood;
     StatusDidChange();
     respawning = false;
+  }
+
+  ArrayList _foodObjects = new ArrayList();
+  void DisplayFoodObjects() {
+    int spawnedFoods = _foodObjects.Count - availableFood;
+    Vector3 scaleFactor = new Vector3(0.5F, 0.5F, 0.5F);
+    if (spawnedFoods < 0) {
+      for (int i = 0; i < Mathf.Abs(spawnedFoods) ; i++) {
+        GameObject foodObject = Instantiate(foodObjectPrefab, CenterTop(), Quaternion.identity) as GameObject;
+        _foodObjects.Add(foodObject);
+        foodObject.transform.localScale = scaleFactor;
+      }
+    }
+    foreach (GameObject obj in _foodObjects) {
+      obj.renderer.enabled = false;
+    }
+    for (int i = 0; i < availableFood ; i++) {
+      GameObject obj = _foodObjects[i] as GameObject;
+      obj.transform.position = CenterTop() + new Vector3(0, scaleFactor.y / 2 + scaleFactor.y * i, 0);
+      obj.renderer.enabled = true;
+    }
   }
 
 }
