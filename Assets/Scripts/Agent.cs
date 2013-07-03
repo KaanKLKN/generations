@@ -253,7 +253,7 @@ public class Agent : MonoBehaviour {
   public void BeMurdered() {
     Notify(AgentNotificationType.Murder);
     manager.IncrementCounter("Died", 1);
-    manager.IncrementCounter("Eaten", 1);
+    manager.IncrementCounter("Killed and Eaten", 1);
     Die();
   }
 

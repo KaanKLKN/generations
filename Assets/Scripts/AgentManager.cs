@@ -74,7 +74,7 @@ public class AgentManager : MonoBehaviour {
   }
 
   public bool PopulationCeilingExceeded() {
-    return livingAgents > populationCeiling;
+    return livingAgents >= populationCeiling;
   }
 
   public Agent BirthAgent() {
