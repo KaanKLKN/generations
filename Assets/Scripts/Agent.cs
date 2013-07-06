@@ -97,7 +97,8 @@ public class Agent : MonoBehaviour {
   }
 
   public void Notify(AgentNotificationType type) {
-    GetComponent<AgentNotifier>().Notify(type);
+    if (manager.showNotifications)
+      GetComponent<AgentNotifier>().Notify(type);
   }
 
   void UpdateAI() {

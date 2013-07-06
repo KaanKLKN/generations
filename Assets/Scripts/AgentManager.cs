@@ -18,12 +18,14 @@ public struct TraitStatistic {
 public class AgentManager : MonoBehaviour {
 
   public Map map;
-  public int agentsPerGeneration = 50;
-  public GameObject agentPrefab;
+  
+  public int startingPopulation = 150;
+  public int populationCeiling  = 500;
 
   public bool placeInGroup = false;
+  public bool showNotifications = true;
 
-  public int populationCeiling = 500;
+  public GameObject agentPrefab;
 
   int livingAgents;
   int deadAgents;
@@ -66,7 +68,7 @@ public class AgentManager : MonoBehaviour {
     deadAgents = 0;
     finishedAgents = 0;
 
-    for (int i=0; i < agentsPerGeneration; i++) {
+    for (int i=0; i < startingPopulation; i++) {
         Agent agent = BirthAgent();
         agent.CreateRandom();
     }
@@ -116,7 +118,7 @@ public class AgentManager : MonoBehaviour {
   }
 
   int PreviousLivingAgents() {
-    return agentsPerGeneration - previousDead - previousFinished;
+    return startingPopulation - previousDead - previousFinished;
   }
 
   void CheckGenerationComplete() {
@@ -134,7 +136,7 @@ public class AgentManager : MonoBehaviour {
     }
     list = list.OrderBy(a => a.Fitness()).ToList();
 
-    Agent[] fittest = list.GetRange(0, agentsPerGeneration / 3).ToArray();
+    Agent[] fittest = list.GetRange(0, startingPopulation / 3).ToArray();
 
     foreach (Agent agent in fittest) {
       agent.SetColor(Color.cyan);
