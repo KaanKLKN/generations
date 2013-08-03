@@ -207,6 +207,56 @@ public class AgentManager : MonoBehaviour {
       CalculateTraitAverages();
   }
 
+  Agent _selectedAgent;
+
+  void LateUpdate () {
+    if (Input.GetMouseButtonDown(0)) {
+      Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+      RaycastHit hit;
+      if (Physics.Raycast(ray, out hit, 10000)) {
+        Agent hitAgent = hit.collider.gameObject.GetComponent<Agent>();
+        if (hitAgent) {
+          SelectAgent(hitAgent);
+        }
+        else {
+          Collider[] hitColliders = Physics.OverlapSphere(hit.point, 1);
+          int i = 0;
+          Agent closestAgent = null;
+          float closestColliderDistance = 100000000f;
+          while (i < hitColliders.Length) {
+            Agent thisAgent = hitColliders[i].gameObject.GetComponent<Agent>();
+            if (thisAgent) {
+              float distance = Vector3.Distance(hit.point, thisAgent.transform.position);
+              if (!closestAgent || distance < closestColliderDistance) {
+                closestAgent = thisAgent;
+                closestColliderDistance = distance;
+              }                
+            }
+            i++;
+          }
+          if (closestAgent) {
+            SelectAgent(closestAgent);
+          }
+        }
+      }
+    }
+  }
+
+  public GameObject agentSelectionPlumbob;
+  GameObject _currentPlumbob;
+
+  void SelectAgent(Agent agent) {
+    _selectedAgent = agent;
+
+    if (_currentPlumbob) {
+      Destroy(_currentPlumbob);
+    }
+
+    _currentPlumbob = Instantiate(agentSelectionPlumbob, agent.transform.position, Quaternion.identity) as GameObject;
+    _currentPlumbob.transform.parent = agent.transform;
+    _currentPlumbob.transform.localPosition = _currentPlumbob.transform.localPosition + new Vector3(0, 1, 0);
+  }
+
   void OnGUI(){
     if (GUILayout.Button("New Map")) {
       Application.LoadLevel ("main");
@@ -230,9 +280,44 @@ public class AgentManager : MonoBehaviour {
     }
     GUILayout.EndVertical ();
 
+    DrawAgentInfoWindow(_selectedAgent);
   }
 
-    System.String DeltaString(float delta) {
+  void DrawAgentInfoWindow(Agent agent) {
+    if (!agent)
+      return;
+
+    GUILayout.BeginArea (new Rect(Screen.width - 150 - 10, 10, 150, Screen.height - 10));
+    GUILayout.BeginVertical ("box");
+
+    // GUILayout.Button ("Click me");
+    // GUILayout.Button ("Or me");
+
+    GUILayout.Label("INHERITED TRAITS");
+    foreach (var pair in agent.Traits()) {
+      NumericalTrait trait = pair.Value as NumericalTrait;
+      if (trait != null) {
+        GUILayout.Label(pair.Key + ": " + trait.floatValue);
+      }
+    }
+
+    GUILayout.Label("CALCULATED TRAITS");
+
+    GUILayout.Label("Speed: " + agent.body.Speed());
+    GUILayout.Label("Strength: " + agent.body.Strength());
+    GUILayout.Label("EnergyDrainPerSecond: " + agent.body.EnergyDrainPerSecond());
+    GUILayout.Label("MaxEnergy: " + agent.body.MaxEnergy());
+    GUILayout.Label("CamouflageFactor: " + agent.body.CamouflageFactor());
+
+    GUILayout.Label("INFO");
+    GUILayout.Label("Lifespan: " + agent.body.Lifespan() + "s");
+
+    GUILayout.EndVertical ();
+    GUILayout.EndArea ();
+
+  }
+
+  System.String DeltaString(float delta) {
     if (delta > 0) {
       return "+" + delta;
     }

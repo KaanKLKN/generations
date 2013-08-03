@@ -79,7 +79,7 @@ public class ReproductiveSystem : Organ {
         parents[1] = otherParent;
         child.CreateFromParents(parents);
 
-        agent.manager.IncrementCounter("Reproduced", 1);
+        agent.TriggerLifeEvent("Reproduced");
         agent.Notify(AgentNotificationType.Sex);
         otherParent.Notify(AgentNotificationType.Sex);
 

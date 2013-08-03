@@ -28,6 +28,10 @@ public class Body : Organ {
     return 50 + 100 * metabolism.InverseFloatValue();
   }
 
+  public float Lifespan() {
+    return MaxEnergy() / EnergyDrainPerSecond();
+  }
+
   public float CamouflageFactor() {
     return Mathf.Abs(hue.floatValue - agent.currentTile.hue);
   }

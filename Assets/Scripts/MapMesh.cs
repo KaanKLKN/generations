@@ -110,6 +110,9 @@ public class MapMesh : MonoBehaviour {
     CalculateMeshTangents(mesh);
 
     GenerateTexture(tiles);
+
+    MeshCollider meshCollider = GetComponent<MeshCollider>();
+    meshCollider.sharedMesh = mesh;
   }
 
   public static void CalculateMeshTangents(Mesh mesh) {

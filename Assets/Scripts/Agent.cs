@@ -83,7 +83,7 @@ public class Agent : MonoBehaviour {
     transform.position = currentTile.CenterTop();
     transform.localScale = transform.localScale + new Vector3(0, Random.Range(-0.1F, 0.1F), 0);
     birthTime = Time.time;
-    manager.IncrementCounter("Born", 1);
+    TriggerLifeEvent("Born");
     UpdateAI();
   }
     
@@ -99,6 +99,12 @@ public class Agent : MonoBehaviour {
   public void Notify(AgentNotificationType type) {
     if (manager.showNotifications)
       GetComponent<AgentNotifier>().Notify(type);
+  }
+
+  public System.String lastEventName;
+  public void TriggerLifeEvent(System.String eventName) {
+    manager.IncrementCounter(eventName, 1);
+    lastEventName = eventName;
   }
 
   void UpdateAI() {
@@ -217,22 +223,22 @@ public class Agent : MonoBehaviour {
 
   void Starve() {
     Notify(AgentNotificationType.Death);
-    manager.IncrementCounter("Died", 1);
-    manager.IncrementCounter("Died of Starvation", 1);
+    TriggerLifeEvent("Died");
+    TriggerLifeEvent("Died of Starvation");
     Die();
   }
 
   void DieOfOldAge() {
     Notify(AgentNotificationType.Death);
-    manager.IncrementCounter("Died", 1);
-    manager.IncrementCounter("Died of Old Age", 1);
+    TriggerLifeEvent("Died");
+    TriggerLifeEvent("Died of Old Age");
     Die();
   }
 
   public void BeMurdered() {
     Notify(AgentNotificationType.Murder);
-    manager.IncrementCounter("Died", 1);
-    manager.IncrementCounter("Killed and Eaten", 1);
+    TriggerLifeEvent("Died");
+    TriggerLifeEvent("Killed and Eaten");
     Die();
   }
 

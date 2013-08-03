@@ -21,7 +21,7 @@ public class HungerCenter : Organ {
     agent.energy += energyAmount;
     if (agent.energy > 1)
       agent.energy = 1;
-    agent.manager.IncrementCounter("Ate", 1);
+    agent.TriggerLifeEvent("Ate");
     agent.Notify(AgentNotificationType.Ate);
     timesEaten++;
   }
@@ -63,7 +63,7 @@ public class HungerCenter : Organ {
     FoodTile foodTile = agent.currentTile as FoodTile;
     if (IsHungry() && foodTile.ConsumeFood(agent)) {
       EatFoodAmount(foodTile.foodEnergy);
-      agent.manager.IncrementCounter("Ate Hay", 1);
+      agent.TriggerLifeEvent("Ate Hay");
     }
   }
 
@@ -85,7 +85,7 @@ public class HungerCenter : Organ {
 
   public void EatAgent(Agent prey) {
     EatFoodAmount(prey.energy);
-    agent.manager.IncrementCounter("Ate Meat", 1);
+    agent.TriggerLifeEvent("Ate Meat");
     prey.BeMurdered();
   }
 
