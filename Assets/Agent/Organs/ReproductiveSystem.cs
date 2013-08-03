@@ -7,7 +7,7 @@ public class ReproductiveSystem : Organ {
 
   public NumericalTrait fertility = new NumericalTrait(0F, 1F); 
 
-  int timesReproduced = 0;
+  public int timesReproduced = 0;
 
   // Reproduction
 
@@ -16,7 +16,7 @@ public class ReproductiveSystem : Organ {
 
   public bool CanReproduce() {
     if (!agent.manager.PopulationCeilingExceeded()
-        && agent.body.OlderThan(PrepubescencyLength())
+        && !IsChild()
         && !_isPregnant
         && timesReproduced < _maxTotalChildren) {
       return true;
@@ -24,17 +24,19 @@ public class ReproductiveSystem : Organ {
     return false;
   }
 
-  public void ReproduceIfPossible() {
+  public AIDecisionType MakeSexDecision() {
     if (CanReproduce()) {
       // Find other agents
       Agent[] otherAgents = agent.currentTile.AgentsHereExcluding(agent);
       if (otherAgents.Length > 0) {
         Agent[] fertileAgents = SelectFertileAgents(otherAgents);
         if (fertileAgents.Length > 0) {
-          GetPregnantWithParent(fertileAgents[Random.Range(0, fertileAgents.Length)]);          
+          GetPregnantWithParent(fertileAgents[Random.Range(0, fertileAgents.Length)]);
+          return AIDecisionType.ShareTurn;          
         }
       }
     }
+    return AIDecisionType.NoDecision;
   }
 
   public Agent[] SelectFertileAgents(Agent[] agents) {
@@ -47,11 +49,15 @@ public class ReproductiveSystem : Organ {
   }
 
   public float PregnancyLength() {
-    return agent.body.Lifespan() * 0.3f;
+    return agent.body.Lifespan() * 0.15f;
   }
 
-  public float PrepubescencyLength() {
-    return agent.body.Lifespan() * 0.3f;
+  public float ChildLength() {
+    return agent.body.Lifespan() * 0.25f;
+  }
+
+  public bool IsChild() {
+    return !agent.body.OlderThan(ChildLength());
   }
 
   Agent _currentPartner = null;

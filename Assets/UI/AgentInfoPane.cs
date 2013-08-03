@@ -38,8 +38,9 @@ public class AgentInfoPane : MonoBehaviour {
 
     GUILayout.BeginHorizontal();
     Tab("Status");
-    Tab("Genetics");
-    Tab("Family");
+    Tab("DNA");
+    Tab("Food");
+    Tab("Sex");
     GUILayout.EndHorizontal();
 
 
@@ -47,11 +48,18 @@ public class AgentInfoPane : MonoBehaviour {
 
     if (TabContent("Status")) {
       GUILayout.Label("INFO");
-      GUILayout.Label("Energy: " + SimpleFloat(agent.energy));
-      GUILayout.Label("Age: " + SimpleFloat(agent.Age()) + " / " + SimpleFloat(agent.body.Lifespan()) + "s (" + SimplePercent(1 - agent.energy / agent.body.MaxEnergy()) + ")");
+      GUILayout.Label("Energy: " + FractionAndPercent(agent.energy, agent.body.MaxEnergy()));
+      GUILayout.Label("Will starve in " + SimpleFloat(agent.body.TimeUntilStarvation()) + "s.");
+      GUILayout.Label("Age: " + FractionAndPercent(agent.Age(), agent.body.Lifespan()));
+      if (agent.reproductiveSystem.IsChild()) {
+        GUILayout.Label("Child for " + SimpleFloat(agent.reproductiveSystem.ChildLength() - agent.Age()) + "s");
+      }
+      else {
+        GUILayout.Label("Adult");
+      }
     }
 
-    if (TabContent("Genetics")) {
+    if (TabContent("DNA")) {
       GUILayout.Label("INHERITED TRAITS");
       foreach (var pair in agent.Traits()) {
         NumericalTrait trait = pair.Value as NumericalTrait;
@@ -69,10 +77,21 @@ public class AgentInfoPane : MonoBehaviour {
       GUILayout.Label("CamouflageFactor: " + agent.body.CamouflageFactor());
     }
 
+    if (TabContent("Food")) {
+      GUILayout.Label("Meals eaten: " + agent.hungerCenter.timesEaten);
+
+      GUILayout.Label("Herbivore: " + agent.hungerCenter.herbivore.boolValue);
+      GUILayout.Label("Hay eaten: " + agent.hungerCenter.timesEatenVeg);
+
+      GUILayout.Label("Carnivore: " + agent.hungerCenter.herbivore.boolValue);
+      GUILayout.Label("Meat eaten: " + agent.hungerCenter.timesEatenMeat);
+    }
+
     //DrawProgressBar(new Rect(0, 0, 200, 16), agent.energy / agent.body.MaxEnergy());
 
-    if (TabContent("Family")) {
+    if (TabContent("Sex")) {
       GUILayout.Label("Generation: " + agent.reproductiveSystem.generation);
+      GUILayout.Label("Times reproduced: " + agent.reproductiveSystem.timesReproduced);
 
       GUILayout.Label("PARENTS");
       Agent[] parents = agent.reproductiveSystem.parents;
@@ -100,6 +119,10 @@ public class AgentInfoPane : MonoBehaviour {
     GUILayout.EndVertical ();
     GUILayout.EndArea ();
 
+  }
+
+  System.String FractionAndPercent(float num, float denom) {
+    return SimpleFloat(num) + " / " + SimpleFloat(denom) + " (" + SimplePercent(num / denom) + ")";
   }
 
   System.String SimplePercent(float percent) {

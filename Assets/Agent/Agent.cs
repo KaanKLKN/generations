@@ -113,11 +113,8 @@ public class Agent : MonoBehaviour {
     if (dead || finished)
       return;
 
-    // Move to a random available tile
-
-    MapTile[] nearby = currentTile.PassableNeighboringTilesForAgent(this);
-    if (nearby.Length == 1) {
-      MoveToTile(nearby[0]);
+    // Make a decision based on reproductive need
+    if (reproductiveSystem.MakeSexDecision() == AIDecisionType.ConsumeTurn) {
       return;
     }
 
@@ -126,9 +123,15 @@ public class Agent : MonoBehaviour {
       return;
     }
 
-    if (Random.value < 0.5) {
-      reproductiveSystem.ReproduceIfPossible();
+    // If there's only one tile, move there.
+
+    MapTile[] nearby = currentTile.PassableNeighboringTilesForAgent(this);
+    if (nearby.Length == 1) {
+      MoveToTile(nearby[0]);
+      return;
     }
+
+    // Move to a random available tile
 
     MapTile[] rejectedNearby = RejectPreviousTiles(nearby);
     if (rejectedNearby.Length > 0) {
@@ -214,7 +217,8 @@ public class Agent : MonoBehaviour {
       if (manager == null)
         return;
 
-      if (energy <= 0F) {
+      if (energy <= 0) {
+        energy = 0;
         Starve();
       }
       else if (Age() >= body.Lifespan()) {

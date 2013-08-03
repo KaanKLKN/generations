@@ -25,15 +25,19 @@ public class Body : Organ {
   }
 
   public float MaxEnergy() {
-    return 15 + 45 * metabolism.InverseFloatValue();
+    return 20 + 20 * size.floatValue;
+  }
+
+  public float TimeUntilStarvation() {
+    return agent.energy / EnergyDrainPerSecond();
   }
 
   public float Lifespan() {
-    return MaxEnergy() / EnergyDrainPerSecond();
+    return 40 + 60 * metabolism.InverseFloatValue();
   }
 
   public bool OlderThan(float seconds) {
-    return agent.energy > seconds;
+    return agent.Age() > seconds;
   }
 
   public float CamouflageFactor() {

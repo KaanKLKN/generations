@@ -25,6 +25,7 @@ public class Organ {
       Trait trait = entry.Value as Trait;
       trait.Randomize();
     }
+    TraitsWereSet();
   }
 
   public void InheritTraitsFromParents(Organ mom, Organ dad, float mutationChance) {
@@ -40,6 +41,11 @@ public class Organ {
         myTrait.Inherit(momTraits[entry.Key] as Trait, dadTraits[entry.Key] as Trait);
       }
     }
+    TraitsWereSet();
+  }
+
+  public virtual void TraitsWereSet() {
+
   }
 
 }

@@ -4,7 +4,7 @@ using System.Collections;
 public class FoodTile : MapTile {
 
   public int startingFood = 1;
-  public float foodEnergy = 1F;
+  public float foodEnergy = 20F;
   public float replenishTime = 2;
 
   public GameObject foodObjectPrefab;

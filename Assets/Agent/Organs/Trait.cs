@@ -64,9 +64,9 @@ public class BooleanTrait : Trait {
   public bool boolValue;
   public float floatValue;
 
-  public void SetValue(bool value) {
-    boolValue = value;
-    floatValue = value ? 1 : 0;
+  public void SetValue(bool v) {
+    boolValue = v;
+    floatValue = v ? 1 : 0;
   }
 
   public override void Randomize() {

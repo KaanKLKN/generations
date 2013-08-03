@@ -10,17 +10,24 @@ public class HungerCenter : Organ {
   public BooleanTrait herbivore = new BooleanTrait(); 
 
   public int timesEaten = 0;
+  public int timesEatenMeat = 0;
+  public int timesEatenVeg = 0;
+
+  public override void TraitsWereSet() {
+    carnivore.SetValue(true);
+    herbivore.SetValue(true);
+  }
 
   // Generic Methods
 
   bool IsHungry() {
-    return agent.energy < 0.75;
+    return true;//agent.energy < 0.75;
   }
 
   public void EatFoodAmount(float energyAmount) {
     agent.energy += energyAmount;
-    if (agent.energy > 1)
-      agent.energy = 1;
+    if (agent.energy > agent.body.MaxEnergy())
+      agent.energy = agent.body.MaxEnergy();
     agent.TriggerLifeEvent("Ate");
     agent.Notify(AgentNotificationType.Ate);
     timesEaten++;
@@ -64,6 +71,7 @@ public class HungerCenter : Organ {
     if (IsHungry() && foodTile.ConsumeFood(agent)) {
       EatFoodAmount(foodTile.foodEnergy);
       agent.TriggerLifeEvent("Ate Hay");
+      timesEatenVeg++;
     }
   }
 
@@ -87,6 +95,7 @@ public class HungerCenter : Organ {
     EatFoodAmount(prey.energy);
     agent.TriggerLifeEvent("Ate Meat");
     prey.BeMurdered();
+    timesEatenMeat++;
   }
 
   public Agent[] SelectWeakerAgents(Agent[] agentList) {
