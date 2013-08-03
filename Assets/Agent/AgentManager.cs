@@ -25,6 +25,8 @@ public class AgentManager : MonoBehaviour {
   public bool placeInGroup = false;
   public bool showNotifications = true;
 
+  public GUISkin guiSkin;
+
   public GameObject agentPrefab;
 
   int livingAgents;
@@ -272,6 +274,9 @@ public class AgentManager : MonoBehaviour {
   }
 
   void OnGUI(){
+
+    GUI.skin = guiSkin;
+
     if (GUILayout.Button("New Map")) {
       Application.LoadLevel ("main");
     }

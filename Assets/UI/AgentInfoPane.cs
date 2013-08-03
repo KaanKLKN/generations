@@ -30,11 +30,12 @@ public class AgentInfoPane : MonoBehaviour {
     if (!agent)
       return;
 
+    GUI.skin = Manager().guiSkin;
+
     GUILayout.BeginArea (new Rect(Screen.width - 200 - 10, 10, 200, Screen.height - 10));
 
     GUILayout.BeginVertical ("box");
     GUILayout.Label(agent.lastEventName);
-    GUILayout.EndVertical ();
 
     GUILayout.BeginHorizontal();
     Tab("Status");
@@ -43,8 +44,6 @@ public class AgentInfoPane : MonoBehaviour {
     Tab("Sex");
     GUILayout.EndHorizontal();
 
-
-    GUILayout.BeginVertical ("box");
 
     if (TabContent("Status")) {
       GUILayout.Label("INFO");
