@@ -36,6 +36,7 @@ public class AgentInfoPane : MonoBehaviour {
 
     GUILayout.BeginVertical ("box");
     GUILayout.Label(agent.lastEventName);
+    GUILayout.Label(agent.AIStateDescription());
 
     GUILayout.BeginHorizontal();
     Tab("Status");

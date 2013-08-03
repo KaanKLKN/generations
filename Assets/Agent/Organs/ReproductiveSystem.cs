@@ -32,6 +32,7 @@ public class ReproductiveSystem : Organ {
         Agent[] fertileAgents = SelectFertileAgents(otherAgents);
         if (fertileAgents.Length > 0) {
           GetPregnantWithParent(fertileAgents[Random.Range(0, fertileAgents.Length)]);
+          agent.DescribeAIState("Geting pregnant");
           return AIDecisionType.ShareTurn;          
         }
       }
@@ -93,6 +94,7 @@ public class ReproductiveSystem : Organ {
     if (IsChild() && Time.time >= AdulthoodTime()) {
       _isChild = false;
       agent.Notify(AgentNotificationType.Puberty);
+      agent.TriggerLifeEvent("Grew Up");
     }
   }
 

@@ -162,7 +162,7 @@ public class MapTile : MonoBehaviour {
       Gizmos.color = Color.red;
       DrawSelectedGizmo();
       Gizmos.color = Color.green;
-      foreach (MapTile passableNeighbor in PassableNeighboringTilesForAgent(null)) {
+      foreach (MapTile passableNeighbor in PassableNeighboringTilesOfTypeForAgent(MapTileType.Food, null)) {
         passableNeighbor.DrawSelectedGizmo();
       }      
     }

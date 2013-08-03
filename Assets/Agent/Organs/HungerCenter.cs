@@ -39,12 +39,15 @@ public class HungerCenter : Organ {
     if (IsHungry()) {
       if (herbivore.boolValue && agent.currentTile.type == MapTileType.Food) {
         EatFoodTile();
+        agent.DescribeAIState("Eating food tile");
         return AIDecisionType.ShareTurn;
       }
       else if (herbivore.boolValue && HeadForFoodTile()) {
+        agent.DescribeAIState("Heading for nearby food tile");
         return AIDecisionType.ConsumeTurn;
       }
       else if (carnivore.boolValue && EatAgentIfPossible()) {
+        agent.DescribeAIState("Eating agent");
         return AIDecisionType.ShareTurn;
       }
     }
@@ -54,7 +57,7 @@ public class HungerCenter : Organ {
   // Food Tiles / Herbivores
 
   bool HeadForFoodTile() {
-    FoodTile[] foodTiles = agent.currentTile.PassableNeighboringTilesOfTypeForAgent(MapTileType.Food, agent) as FoodTile[];
+    MapTile[] foodTiles = agent.currentTile.PassableNeighboringTilesOfTypeForAgent(MapTileType.Food, agent) as MapTile[];
     if (foodTiles != null && foodTiles.Length > 0) {
       FoodTile foodTile = foodTiles[Random.Range(0, foodTiles.Length)] as FoodTile;
       if (foodTile.CanConsumeFood(agent)) {

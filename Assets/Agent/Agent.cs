@@ -88,6 +88,7 @@ public class Agent : MonoBehaviour {
     transform.localScale = transform.localScale + new Vector3(0, Random.Range(-0.1F, 0.1F), 0);
     birthTime = Time.time;
     TriggerLifeEvent("Born");
+    DescribeAIState("Spawned");
     UpdateAI();
   }
     
@@ -111,6 +112,19 @@ public class Agent : MonoBehaviour {
     lastEventName = eventName;
   }
 
+  System.String previousAIStateDescription;
+  System.String aiStateDescription;
+  int aiIteration = 0;
+  public void DescribeAIState(System.String state) {
+    previousAIStateDescription = aiStateDescription;
+    aiStateDescription = state;
+    aiIteration++;
+  }
+
+  public System.String AIStateDescription() {
+    return "[" + aiIteration + "] " + aiStateDescription + "\n[" + (aiIteration - 1) + "] " + previousAIStateDescription ;
+  }
+
   void UpdateAI() {
     if (dead || finished)
       return;
@@ -130,6 +144,7 @@ public class Agent : MonoBehaviour {
     MapTile[] nearby = currentTile.PassableNeighboringTilesForAgent(this);
     if (nearby.Length == 1) {
       MoveToTile(nearby[0]);
+      DescribeAIState("Heading to only possible tile");
       return;
     }
 
@@ -139,6 +154,7 @@ public class Agent : MonoBehaviour {
     if (rejectedNearby.Length > 0) {
       MapTile randomTile = rejectedNearby[Random.Range(0, rejectedNearby.Length)];
       MoveToTile(randomTile);      
+      DescribeAIState("Heading to random tile");
     }
 
   }
