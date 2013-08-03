@@ -49,6 +49,9 @@ public class ReproductiveSystem : Organ {
     return fertile.ToArray( typeof( Agent ) ) as Agent[];
   }
 
+  public Agent[] parents;
+  public int generation = 0;
+
   public Agent[] ReproduceWith(Agent otherParent) {
 
     /*if (Random.value <= fertility.floatValue 
@@ -74,10 +77,17 @@ public class ReproductiveSystem : Organ {
 
         child.currentTile = agent.currentTile;
 
-        Agent[] parents = new Agent[2];
-        parents[0] = agent;
-        parents[1] = otherParent;
-        child.CreateFromParents(parents);
+        Agent[] theParents = new Agent[2];
+        theParents[0] = agent;
+        theParents[1] = otherParent;
+        child.CreateFromParents(theParents);
+
+        int highestParentGeneration = theParents[0].reproductiveSystem.generation;
+        if (theParents[1].reproductiveSystem.generation > highestParentGeneration)
+          highestParentGeneration = theParents[1].reproductiveSystem.generation;
+
+        child.reproductiveSystem.parents = theParents;
+        child.reproductiveSystem.generation = highestParentGeneration + 1;
 
         agent.TriggerLifeEvent("Reproduced");
         agent.Notify(AgentNotificationType.Sex);

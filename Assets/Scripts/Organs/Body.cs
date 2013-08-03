@@ -25,7 +25,7 @@ public class Body : Organ {
   }
 
   public float MaxEnergy() {
-    return 50 + 100 * metabolism.InverseFloatValue();
+    return 15 + 30 * metabolism.InverseFloatValue();
   }
 
   public float Lifespan() {

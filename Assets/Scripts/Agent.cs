@@ -9,6 +9,8 @@ public enum AIDecisionType {
   NoDecision
 }
 
+// Call this game Mammaljam
+
 public class Agent : MonoBehaviour {
 
   public int timesReproduced;

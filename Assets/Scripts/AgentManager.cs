@@ -34,10 +34,14 @@ public class AgentManager : MonoBehaviour {
 
   public ArrayList currentAgents;
 
+  AgentInfoPane _agentInfoPane;
+
   void Start () {
 
     generation = 0;
     currentAgents = new ArrayList();
+
+    _agentInfoPane = GetComponent<AgentInfoPane>();
 
     // Build the map
     map.Generate();
@@ -245,7 +249,7 @@ public class AgentManager : MonoBehaviour {
   public GameObject agentSelectionPlumbob;
   GameObject _currentPlumbob;
 
-  void SelectAgent(Agent agent) {
+  public void SelectAgent(Agent agent) {
     _selectedAgent = agent;
 
     if (_currentPlumbob) {
@@ -255,6 +259,8 @@ public class AgentManager : MonoBehaviour {
     _currentPlumbob = Instantiate(agentSelectionPlumbob, agent.transform.position, Quaternion.identity) as GameObject;
     _currentPlumbob.transform.parent = agent.transform;
     _currentPlumbob.transform.localPosition = _currentPlumbob.transform.localPosition + new Vector3(0, 1, 0);
+
+    _agentInfoPane.DisplayAgent(agent);
   }
 
   void OnGUI(){
@@ -280,42 +286,8 @@ public class AgentManager : MonoBehaviour {
     }
     GUILayout.EndVertical ();
 
-    DrawAgentInfoWindow(_selectedAgent);
   }
 
-  void DrawAgentInfoWindow(Agent agent) {
-    if (!agent)
-      return;
-
-    GUILayout.BeginArea (new Rect(Screen.width - 150 - 10, 10, 150, Screen.height - 10));
-    GUILayout.BeginVertical ("box");
-
-    // GUILayout.Button ("Click me");
-    // GUILayout.Button ("Or me");
-
-    GUILayout.Label("INHERITED TRAITS");
-    foreach (var pair in agent.Traits()) {
-      NumericalTrait trait = pair.Value as NumericalTrait;
-      if (trait != null) {
-        GUILayout.Label(pair.Key + ": " + trait.floatValue);
-      }
-    }
-
-    GUILayout.Label("CALCULATED TRAITS");
-
-    GUILayout.Label("Speed: " + agent.body.Speed());
-    GUILayout.Label("Strength: " + agent.body.Strength());
-    GUILayout.Label("EnergyDrainPerSecond: " + agent.body.EnergyDrainPerSecond());
-    GUILayout.Label("MaxEnergy: " + agent.body.MaxEnergy());
-    GUILayout.Label("CamouflageFactor: " + agent.body.CamouflageFactor());
-
-    GUILayout.Label("INFO");
-    GUILayout.Label("Lifespan: " + agent.body.Lifespan() + "s");
-
-    GUILayout.EndVertical ();
-    GUILayout.EndArea ();
-
-  }
 
   System.String DeltaString(float delta) {
     if (delta > 0) {
