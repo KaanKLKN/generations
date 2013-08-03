@@ -68,6 +68,7 @@ public class FoodTile : MapTile {
         GameObject foodObject = Instantiate(foodObjectPrefab, CenterTop(), Quaternion.identity) as GameObject;
         _foodObjects.Add(foodObject);
         foodObject.transform.localScale = scaleFactor;
+        foodObject.transform.parent = transform;
       }
     }
     foreach (GameObject obj in _foodObjects) {
