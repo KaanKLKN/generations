@@ -273,6 +273,10 @@ public class AgentManager : MonoBehaviour {
     _agentInfoPane.DisplayAgent(agent);
   }
 
+  System.String[] timescaleDescriptions = {"Pause", "1x", "2x", "4x", "8x", "16x"};
+  float[] timescales = {0, 1, 2, 4, 8, 16};
+  int selectedTimeScale = 1;
+
   void OnGUI(){
 
     GUI.skin = guiSkin;
@@ -280,6 +284,9 @@ public class AgentManager : MonoBehaviour {
     if (GUILayout.Button("New Map")) {
       Application.LoadLevel ("main");
     }
+
+    selectedTimeScale = GUILayout.Toolbar(selectedTimeScale, timescaleDescriptions);
+    Time.timeScale = timescales[selectedTimeScale];
 
     GUILayout.BeginHorizontal ("box");
     GUILayout.Label("Spawn generation " + generation);

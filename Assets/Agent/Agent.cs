@@ -30,8 +30,6 @@ public class Agent : MonoBehaviour {
   public float birthTime;
   public float deathTime;
 
-  public static float timeScaleFactor = 1;
-
   private static float mutationChance = 0.05F; // 0-1
 
   public Body body = new Body();
@@ -326,7 +324,7 @@ public class Agent : MonoBehaviour {
   }
 
   float NormalizedSpeed() {
-    return body.Speed() * timeScaleFactor;
+    return body.Speed();
   }
 
 }

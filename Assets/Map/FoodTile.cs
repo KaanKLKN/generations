@@ -49,7 +49,7 @@ public class FoodTile : MapTile {
   void OutOfFood() {
     if (!respawning) {
       respawning = true;
-      Invoke("ReplenishFood", replenishTime / (float)Agent.timeScaleFactor);
+      Invoke("ReplenishFood", replenishTime);
     }
   }
 
