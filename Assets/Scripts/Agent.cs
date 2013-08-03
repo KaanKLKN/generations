@@ -211,12 +211,15 @@ public class Agent : MonoBehaviour {
 
       //SetColorToHealth();
 
-      if (manager ==null)
+      if (manager == null)
         return;
 
       if (energy <= 0F) {
         Starve();
       }
+
+      reproductiveSystem.Update();
+
     }
 
   }

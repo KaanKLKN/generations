@@ -11,16 +11,13 @@ public class ReproductiveSystem : Organ {
 
   // Reproduction
 
-  static float reproductionCost = 0.1F;
-  static float reproductionThreshold = 0.5F;
-
-  static int _maxTotalChildren = 10;
-  static int _maxLitterSize = 5;
+  static int _maxTotalChildren = 9;
+  static int _maxLitterSize = 3;
 
   public bool CanReproduce() {
     if (!agent.manager.PopulationCeilingExceeded()
-        //&& agent.hungerCenter.timesEaten > 1 
-        && agent.energy > agent.body.MaxEnergy() * reproductionThreshold 
+        && agent.body.OlderThan(PrepubescencyLength())
+        && !_isPregnant
         && timesReproduced < _maxTotalChildren) {
       return true;
     }
@@ -34,7 +31,7 @@ public class ReproductiveSystem : Organ {
       if (otherAgents.Length > 0) {
         Agent[] fertileAgents = SelectFertileAgents(otherAgents);
         if (fertileAgents.Length > 0) {
-          ReproduceWith(fertileAgents[Random.Range(0, fertileAgents.Length)]);          
+          GetPregnantWithParent(fertileAgents[Random.Range(0, fertileAgents.Length)]);          
         }
       }
     }
@@ -49,10 +46,38 @@ public class ReproductiveSystem : Organ {
     return fertile.ToArray( typeof( Agent ) ) as Agent[];
   }
 
+  public float PregnancyLength() {
+    return agent.body.Lifespan() * 0.3f;
+  }
+
+  public float PrepubescencyLength() {
+    return agent.body.Lifespan() * 0.3f;
+  }
+
+  Agent _currentPartner = null;
+  bool _isPregnant = false;
+  float _birthDate = 0;
+  public void GetPregnantWithParent(Agent otherParent) {
+    agent.TriggerLifeEvent("Got Pregnant");
+    _currentPartner = otherParent;
+    _isPregnant = true;
+    _birthDate = Time.time + PregnancyLength();
+    agent.Notify(AgentNotificationType.Pregnant);
+    otherParent.Notify(AgentNotificationType.Sex);
+  }
+
+  public void Update() {
+    if (_isPregnant && Time.time >= _birthDate) {
+      GiveBirth(_currentPartner);
+      _isPregnant = false;
+      _currentPartner = null;
+    }
+  }
+
   public Agent[] parents;
   public int generation = 0;
 
-  public Agent[] ReproduceWith(Agent otherParent) {
+  public Agent[] GiveBirth(Agent otherParent) {
 
     /*if (Random.value <= fertility.floatValue 
         || Random.value <= otherParent.reproductiveSystem.fertility.floatValue) {
@@ -63,16 +88,17 @@ public class ReproductiveSystem : Organ {
         Random.Range(_maxLitterSize * fertility.floatValue,
                      _maxLitterSize * otherParent.reproductiveSystem.fertility.floatValue)
         );
+    if (kidsToHave < 1) {
+      kidsToHave = 1;
+    }
 
     Agent[] children = new Agent[kidsToHave];
 
     for (int i=0; i < kidsToHave; i++) {
-      if (CanReproduce() && otherParent.reproductiveSystem.CanReproduce()) {
+      if (!agent.manager.PopulationCeilingExceeded()) {
         Agent child = agent.manager.BirthAgent();
 
-        // agent.energy -= reproductionCost;
         timesReproduced++;
-        // otherParent.energy -= reproductionCost;
         otherParent.reproductiveSystem.timesReproduced++;
 
         child.currentTile = agent.currentTile;
@@ -89,9 +115,7 @@ public class ReproductiveSystem : Organ {
         child.reproductiveSystem.parents = theParents;
         child.reproductiveSystem.generation = highestParentGeneration + 1;
 
-        agent.TriggerLifeEvent("Reproduced");
-        agent.Notify(AgentNotificationType.Sex);
-        otherParent.Notify(AgentNotificationType.Sex);
+        agent.TriggerLifeEvent("Gave Birth");
 
         child.Notify(AgentNotificationType.Birth);
 
@@ -102,5 +126,6 @@ public class ReproductiveSystem : Organ {
 
     return children;
   }
+
 
 }

@@ -22,25 +22,27 @@ public class AgentInfoPane : MonoBehaviour {
 
     GUILayout.Label(agent.lastEventName);
 
+    GUILayout.Label("INFO");
+    GUILayout.Label("Lifespan: " + SimpleFloat(agent.body.Lifespan()) + "s (" + SimplePercent(1 - agent.energy / agent.body.MaxEnergy()) + ")");
+    GUILayout.Label("Energy: " + SimpleFloat(agent.energy));
+    GUILayout.Label("Generation: " + agent.reproductiveSystem.generation);
+
     GUILayout.Label("INHERITED TRAITS");
     foreach (var pair in agent.Traits()) {
       NumericalTrait trait = pair.Value as NumericalTrait;
       if (trait != null) {
-        GUILayout.Label(pair.Key + ": " + trait.floatValue);
+        GUILayout.Label(pair.Key + ": " + SimpleFloat(trait.floatValue));
       }
     }
 
     GUILayout.Label("CALCULATED TRAITS");
 
-    GUILayout.Label("Speed: " + agent.body.Speed());
-    GUILayout.Label("Strength: " + agent.body.Strength());
-    GUILayout.Label("EnergyDrainPerSecond: " + agent.body.EnergyDrainPerSecond());
-    GUILayout.Label("MaxEnergy: " + agent.body.MaxEnergy());
+    GUILayout.Label("Speed: " + SimpleFloat(agent.body.Speed()));
+    GUILayout.Label("Strength: " + SimpleFloat(agent.body.Strength()));
+    GUILayout.Label("EnergyDrainPerSecond: " + SimpleFloat(agent.body.EnergyDrainPerSecond()));
+    GUILayout.Label("MaxEnergy: " + SimpleFloat(agent.body.MaxEnergy()));
     GUILayout.Label("CamouflageFactor: " + agent.body.CamouflageFactor());
 
-    GUILayout.Label("INFO");
-    GUILayout.Label("Lifespan: " + agent.body.Lifespan() + "s");
-    GUILayout.Label("Generation: " + agent.reproductiveSystem.generation);
 
     //DrawProgressBar(new Rect(0, 0, 200, 16), agent.energy / agent.body.MaxEnergy());
 
@@ -58,6 +60,14 @@ public class AgentInfoPane : MonoBehaviour {
     GUILayout.EndVertical ();
     GUILayout.EndArea ();
 
+  }
+
+  System.String SimplePercent(float percent) {
+    return Mathf.RoundToInt(percent * 100) + "%";
+  }
+
+  System.String SimpleFloat(float amount) {
+    return amount.ToString("F2");
   }
 
   public Texture2D progressBarFull;

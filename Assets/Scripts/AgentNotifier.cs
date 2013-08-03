@@ -3,6 +3,7 @@ using System.Collections;
 
 public enum AgentNotificationType {
   Sex,
+  Pregnant,
   Birth,
   Death,
   Murder,
@@ -15,6 +16,7 @@ public class AgentNotifier : MonoBehaviour {
   public float notificationDuration = 1F;
 
   public Texture2D sexTexture;
+  public Texture2D pregnantTexture;
   public Texture2D birthTexture;
   public Texture2D deathTexture;
   public Texture2D ateTexture;
@@ -58,6 +60,9 @@ public class AgentNotifier : MonoBehaviour {
     }
     else if (type == AgentNotificationType.Birth) {
       _myMaterial.mainTexture = birthTexture;
+    }
+    else if (type == AgentNotificationType.Pregnant) {
+      _myMaterial.mainTexture = pregnantTexture;
     }
     else if (type == AgentNotificationType.Death) {
       _myMaterial.mainTexture = deathTexture;

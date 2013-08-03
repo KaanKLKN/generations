@@ -32,6 +32,10 @@ public class Body : Organ {
     return MaxEnergy() / EnergyDrainPerSecond();
   }
 
+  public bool OlderThan(float seconds) {
+    return agent.energy > seconds;
+  }
+
   public float CamouflageFactor() {
     return Mathf.Abs(hue.floatValue - agent.currentTile.hue);
   }
