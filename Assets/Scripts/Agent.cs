@@ -78,7 +78,7 @@ public class Agent : MonoBehaviour {
   void FinishCreating() {
     dead = false;
     finished = false;
-    energy = body.startingEnergy.floatValue;
+    energy = body.MaxEnergy();
     SetColor(new HSBColor(body.hue.floatValue, 1, 1).ToColor());
     transform.position = currentTile.CenterTop();
     transform.localScale = transform.localScale + new Vector3(0, Random.Range(-0.1F, 0.1F), 0);
@@ -194,31 +194,12 @@ public class Agent : MonoBehaviour {
     SetColor(currentColor.ToColor());
   }
 
-  float EnergyUsageRate() {
-    float rate = 0.01F * timeScaleFactor; // Lifespan
-    //rate += speed / 100; // Faster guys use more energy
-    return rate;
-  }
-
-  float LifeRemaining() {
-    float deathDate = birthTime + (body.lifespan.floatValue / timeScaleFactor);
-    return (deathDate - Time.time);
-  }
-
-  float LifeRemainingPercent() {
-    return LifeRemaining() / (body.lifespan.floatValue / timeScaleFactor);
-  }
-
-  float TimeToDieOfHunger() {
-    return (body.lifespan.floatValue / timeScaleFactor) * 0.75F;
-  }
-
   void Update() {
 
     if (!dead && !finished) {
 
       // Reduce energy for lifespan
-      energy -= Time.deltaTime * (1 / TimeToDieOfHunger());
+      energy -= Time.deltaTime * body.EnergyDrainPerSecond();
 
       //SetColorToHealth();
 
@@ -227,9 +208,6 @@ public class Agent : MonoBehaviour {
 
       if (energy <= 0F) {
         Starve();
-      }
-      else if (LifeRemaining() <= 0F) {
-        DieOfOldAge();
       }
     }
 
@@ -304,7 +282,7 @@ public class Agent : MonoBehaviour {
   }
 
   float NormalizedSpeed() {
-    return body.speed.floatValue * timeScaleFactor;
+    return body.Speed() * timeScaleFactor;
   }
 
 }

@@ -90,12 +90,12 @@ public class HungerCenter : Organ {
   }
 
   public Agent[] SelectWeakerAgents(Agent[] agentList) {
-    ArrayList fertile = new ArrayList();
+    ArrayList weaker = new ArrayList();
     foreach (Agent testAgent in agentList) {
-        if (testAgent.body.strength.floatValue < agent.body.strength.floatValue)
-            fertile.Add(testAgent);
+        if (testAgent.body.Strength() < agent.body.Strength())
+            weaker.Add(testAgent);
     }
-    return fertile.ToArray( typeof( Agent ) ) as Agent[];
+    return weaker.ToArray( typeof( Agent ) ) as Agent[];
   }
 
 }

@@ -41,6 +41,22 @@ public class NumericalTrait : Trait {
     SetValue(Random.Range(nt1.floatValue, nt2.floatValue));
   }
 
+  public float LowerFactor() {
+    if (floatValue < 0.5f)
+      return (1 - floatValue) * 2;
+    return 0;
+  }
+
+  public float UpperFactor() {
+    if (floatValue > 0.5)
+      return (floatValue - 0.5f) * 2;
+    return 0;
+  }
+
+  public float InverseFloatValue() {
+    return 1 - floatValue;
+  }
+
 }
 
 public class BooleanTrait : Trait {

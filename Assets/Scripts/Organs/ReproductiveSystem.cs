@@ -20,7 +20,7 @@ public class ReproductiveSystem : Organ {
   public bool CanReproduce() {
     if (!agent.manager.PopulationCeilingExceeded()
         //&& agent.hungerCenter.timesEaten > 1 
-        && agent.energy > reproductionThreshold 
+        && agent.energy > agent.body.MaxEnergy() * reproductionThreshold 
         && timesReproduced < _maxTotalChildren) {
       return true;
     }
@@ -67,9 +67,9 @@ public class ReproductiveSystem : Organ {
       if (CanReproduce() && otherParent.reproductiveSystem.CanReproduce()) {
         Agent child = agent.manager.BirthAgent();
 
-        agent.energy -= reproductionCost;
+        // agent.energy -= reproductionCost;
         timesReproduced++;
-        otherParent.energy -= reproductionCost;
+        // otherParent.energy -= reproductionCost;
         otherParent.reproductiveSystem.timesReproduced++;
 
         child.currentTile = agent.currentTile;
@@ -78,8 +78,6 @@ public class ReproductiveSystem : Organ {
         parents[0] = agent;
         parents[1] = otherParent;
         child.CreateFromParents(parents);
-
-        child.energy = reproductionThreshold;
 
         agent.manager.IncrementCounter("Reproduced", 1);
         agent.Notify(AgentNotificationType.Sex);

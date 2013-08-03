@@ -4,6 +4,62 @@
 		"selected_items":
 		[
 			[
+				"Randm",
+				"Randomize"
+			],
+			[
+				"bool",
+				"boolValue"
+			],
+			[
+				"food",
+				"foodTile"
+			],
+			[
+				"ener",
+				"energyAmount"
+			],
+			[
+				"hung",
+				"hungerCenter"
+			],
+			[
+				"RAndom",
+				"RandomizeTraits"
+			],
+			[
+				"Inher",
+				"InheritTraitsFromParents"
+			],
+			[
+				"cure",
+				"currentAgents"
+			],
+			[
+				"dad",
+				"dadTraits"
+			],
+			[
+				"mom",
+				"momTraits"
+			],
+			[
+				"trait",
+				"traitValues"
+			],
+			[
+				"int",
+				"intValue"
+			],
+			[
+				"float",
+				"floatValue"
+			],
+			[
+				"trai",
+				"traitName"
+			],
+			[
 				"_ma",
 				"_maximumChildren"
 			],
@@ -458,72 +514,32 @@
 			[
 				"dash",
 				"dash_tab_color_selected"
-			],
-			[
-				"margin",
-				"margin-left"
-			],
-			[
-				"text-",
-				"text-decoration"
-			],
-			[
-				"held",
-				"held_at"
-			],
-			[
-				"sold",
-				"sold_at"
-			],
-			[
-				"appr",
-				"approval_process_completed"
-			],
-			[
-				"cam",
-				"campaign"
-			],
-			[
-				"hed",
-				"held_at"
-			],
-			[
-				"camp",
-				"campaign_approvals"
-			],
-			[
-				"attach",
-				"attached_ad_spots"
-			],
-			[
-				"expire",
-				"expires_at"
-			],
-			[
-				"exp",
-				"expires_at"
-			],
-			[
-				"app",
-				"approval"
-			],
-			[
-				"border",
-				"border-top"
-			],
-			[
-				"back",
-				"background-color"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "Scripts/Map.cs",
+			"file": "Scripts/Organs/HungerCenter.cs",
 			"settings":
 			{
-				"buffer_size": 3970,
+				"buffer_size": 2884,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Scripts/AgentManager.cs",
+			"settings":
+			{
+				"buffer_size": 5828,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/wil/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 384,
 				"line_ending": "Unix"
 			}
 		},
@@ -531,15 +547,7 @@
 			"file": "Scripts/Agent.cs",
 			"settings":
 			{
-				"buffer_size": 12634,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "Scripts/AgentNotifier.cs",
-			"settings":
-			{
-				"buffer_size": 2544,
+				"buffer_size": 7754,
 				"line_ending": "Unix"
 			}
 		}
@@ -547,9 +555,21 @@
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 137.0,
+		"height": 181.0,
 		"selected_items":
 		[
+			[
+				"pack lis",
+				"Package Control: List Packages"
+			],
+			[
+				"list pa",
+				"Package Control: List Packages"
+			],
+			[
+				"packa",
+				"Package Control: List Packages"
+			],
 			[
 				"project",
 				"Project: Save As"
@@ -624,12 +644,19 @@
 	},
 	"file_history":
 	[
+		"/Users/wil/Code/fitness/Assets/Scripts/Organs/Trait.cs",
+		"/Users/wil/Code/fitness/Assets/Scripts/Organs/Organ.cs",
+		"/Users/wil/Code/fitness/Assets/Scripts/Organs/Body.cs",
+		"/Users/wil/Code/fitness/Assets/Scripts/Organs/HungerCenter.cs",
 		"/Users/wil/Code/fitness/Assets/Scripts/Agent.cs",
-		"/Users/wil/Code/fitness/Assets/Scripts/AgentManager.cs",
+		"/Users/wil/Code/fitness/Assets/Scripts/Organs/ReproductiveSystem.cs",
 		"/Users/wil/Code/fitness/Assets/Scripts/MapTile.cs",
+		"/Users/wil/Code/fitness/Assets/Scripts/AgentManager.cs",
 		"/Users/wil/Code/fitness/Assets/Scripts/Map.cs",
-		"/Users/wil/Code/fitness/Assets/Scripts/MapMesh.cs",
+		"/Users/wil/Code/fitness/Assets/evolution.sublime-project",
+		"/Users/wil/Code/fitness/Assets/Materials/Agent.mat",
 		"/Users/wil/Code/fitness/Assets/Scripts/AgentNotifier.cs",
+		"/Users/wil/Code/fitness/Assets/Scripts/MapMesh.cs",
 		"/Users/wil/Code/fitness/Assets/Notifier.meta",
 		"/Users/wil/Code/fitness/Assets/Scripts/FoodTile.cs",
 		"/Users/wil/Code/fitness/Assets/Scripts/CameraFacingBillboard.cs",
@@ -744,14 +771,7 @@
 		"/Users/wil/code/nightflow-server/app/views/api/users/_location_services.json.jbuilder",
 		"/Users/wil/code/nightflow-server/app/views/api/groups/current.json.jbuilder",
 		"/Users/wil/code/nightflow-server/app/models/location.rb",
-		"/Users/wil/code/nightflow-server/app/views/api/users/_location_services_status.json.jbuilder",
-		"/Users/wil/code/nightflow-server/db/schema.rb",
-		"/Users/wil/code/nightflow-server/app/controllers/api/friends_controller.rb",
-		"/Users/wil/code/nightflow-server/app/models/post.rb",
-		"/Users/wil/code/nightflow-server/app/models/photo.rb",
-		"/Users/wil/code/nightflow-server/app/views/api/photos/_photo.json.jbuilder",
-		"/Users/wil/code/nightflow-server/app/uploaders/photo_uploader.rb",
-		"/Users/wil/code/nightflow-server/app/views/api/groups/updates/_message.json.jbuilder"
+		"/Users/wil/code/nightflow-server/app/views/api/users/_location_services_status.json.jbuilder"
 	],
 	"find":
 	{
@@ -770,6 +790,54 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"populationCeiling",
+			"PopulationCeiling",
+			"populationCeiling",
+			"agentsPerGeneration",
+			"NumericalTrait",
+			"nt",
+			"NumericalTrait",
+			"_maxLitterSize",
+			"maxChildren",
+			"_maximumChildren",
+			"timeseat",
+			"currenttile",
+			"energy",
+			"movetotile",
+			"agent",
+			"agents",
+			"EatAgentIfPossible",
+			"ArrivedAtFoodTile",
+			"DidEat",
+			"energy",
+			"Food",
+			"food",
+			"foodspots",
+			"reproductiveSystem",
+			"_minEnergy",
+			"hunger",
+			"hidein",
+			"hue",
+			"startingEnergy",
+			"vision",
+			"fertility",
+			"strength",
+			"speed",
+			"InheritTraitsFromParentsWithChanceOfMutation",
+			"InheritTraitsFromParents",
+			"reproductiveSystem",
+			"lifesp",
+			"currentAgents",
+			"CalculateTraitAverages",
+			"int",
+			"InheritableTraitValues",
+			"neighborList",
+			"fertility",
+			"MapPoint",
+			"fertil",
+			"agent",
+			"reproduceif",
+			"timeseat",
 			"timesEaten",
 			"ReproduceIfPossible",
 			"hue",
@@ -849,55 +917,7 @@
 			"passableneight",
 			"sourceTile",
 			"corout",
-			"eat",
-			"EXIT",
-			"currentAgents",
-			"liferem",
-			"lifeRemaining",
-			"20F",
-			"20",
-			"current",
-			"MapTile",
-			"neighborList",
-			"MapTile",
-			"food",
-			"color",
-			"finish",
-			"north",
-			"local",
-			"curre",
-			"currentFreeWill",
-			"FreeWill",
-			"public",
-			"LockOutTile",
-			"hunger",
-			"freeWill",
-			"dead",
-			"livingAgents",
-			"finishe",
-			"energy",
-			"map",
-			"Agent",
-			"otherLocation",
-			"random",
-			"), Random.Range",
-			"speed",
-			"pow",
-			"Mathf",
-			"loc",
-			"ongui",
-			"MoveToTileComplete",
-			"map.TileSize() / 2",
-			"ParkObject",
-			"tiles",
-			", height",
-			"GridLocation",
-			"MoveComplete",
-			"PositionForTileAtIndices",
-			"- 1",
-			"tileObject",
-			"ground",
-			"gridSizeZ"
+			"eat"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -916,23 +936,23 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "Scripts/Map.cs",
+					"file": "Scripts/Organs/HungerCenter.cs",
 					"settings":
 					{
-						"buffer_size": 3970,
+						"buffer_size": 2884,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								752,
-								787
+								0,
+								0
 							]
 						],
 						"settings":
@@ -942,25 +962,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 143.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "Scripts/Agent.cs",
+					"file": "Scripts/AgentManager.cs",
 					"settings":
 					{
-						"buffer_size": 12634,
+						"buffer_size": 5828,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								10399,
-								10399
+								529,
+								546
 							]
 						],
 						"settings":
@@ -970,33 +990,52 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 7063.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "Scripts/AgentNotifier.cs",
+					"file": "/Users/wil/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
 					"settings":
 					{
-						"buffer_size": 2544,
+						"buffer_size": 384,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1908,
-								1908
-							],
+								2,
+								74
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "Scripts/Agent.cs",
+					"settings":
+					{
+						"buffer_size": 7754,
+						"regions":
+						{
+						},
+						"selection":
+						[
 							[
-								1911,
-								1911
-							],
-							[
-								1914,
-								1914
+								2583,
+								2583
 							]
 						],
 						"settings":
@@ -1006,7 +1045,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 430.0,
+						"translation.y": 1304.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1056,6 +1095,38 @@
 		"selected_items":
 		[
 			[
+				"age",
+				"Scripts/Agent.cs"
+			],
+			[
+				"agent",
+				"Scripts/AgentManager.cs"
+			],
+			[
+				"trai",
+				"Scripts/Organs/Trait.cs"
+			],
+			[
+				"hunger",
+				"Scripts/Organs/HungerCenter.cs"
+			],
+			[
+				"maptil",
+				"Scripts/MapTile.cs"
+			],
+			[
+				"repr",
+				"Scripts/Organs/ReproductiveSystem.cs"
+			],
+			[
+				"orga",
+				"Scripts/Organs/Organ.cs"
+			],
+			[
+				"manag",
+				"Scripts/AgentManager.cs"
+			],
+			[
 				"notif",
 				"Scripts/AgentNotifier.cs"
 			],
@@ -1064,20 +1135,8 @@
 				"Scripts/Agent.cs"
 			],
 			[
-				"agent",
-				"Scripts/AgentManager.cs"
-			],
-			[
-				"maptil",
-				"Scripts/MapTile.cs"
-			],
-			[
 				"map",
 				"Scripts/Map.cs"
-			],
-			[
-				"age",
-				"Scripts/Agent.cs"
 			],
 			[
 				"tile",
@@ -1546,26 +1605,6 @@
 			[
 				"_venu",
 				"app/views/api/venues/_venue.json.jbuilder"
-			],
-			[
-				"polloption",
-				"app/controllers/api/destination_options_controller.rb"
-			],
-			[
-				"destpoll",
-				"app/models/destination_poll.rb"
-			],
-			[
-				"destpollcon",
-				"app/controllers/api/destination_polls_controller.rb"
-			],
-			[
-				"destpol",
-				"app/models/destination_poll.rb"
-			],
-			[
-				"addlock",
-				"db/migrate/20130517102128_add_locked_to_destination_poll_responses.rb"
 			]
 		],
 		"width": 0.0
@@ -1582,6 +1621,6 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 319.0,
+	"side_bar_width": 279.0,
 	"status_bar_visible": true
 }

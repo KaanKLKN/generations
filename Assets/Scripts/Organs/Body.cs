@@ -5,12 +5,28 @@ using System.Linq;
 
 public class Body : Organ {
 
-  public NumericalTrait lifespan = new NumericalTrait(35, 45); 
-  public NumericalTrait speed = new NumericalTrait(0.5F, 4.0F); 
-  public NumericalTrait strength = new NumericalTrait(0, 1); 
-  public NumericalTrait startingEnergy = new NumericalTrait(0.8F, 1); 
   public NumericalTrait hue = new NumericalTrait(0, 1); 
-  public NumericalTrait hunger = new NumericalTrait(0, 1); 
+
+  public NumericalTrait metabolism = new NumericalTrait(0, 1); 
+  public NumericalTrait size = new NumericalTrait(0, 1); 
+
+  // Secondary Traits
+
+  public float Speed() {
+    return 1 + metabolism.floatValue - size.floatValue;
+  }
+
+  public float Strength() {
+    return 1 + size.floatValue;
+  }
+
+  public float EnergyDrainPerSecond() {
+    return metabolism.floatValue * 2;
+  }
+
+  public float MaxEnergy() {
+    return 50 + 100 * metabolism.InverseFloatValue();
+  }
 
   public float CamouflageFactor() {
     return Mathf.Abs(hue.floatValue - agent.currentTile.hue);
