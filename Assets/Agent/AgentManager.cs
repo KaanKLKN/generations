@@ -211,8 +211,6 @@ public class AgentManager : MonoBehaviour {
       CalculateTraitAverages();
   }
 
-  Agent _selectedAgent;
-
   void LateUpdate () {
     if (Input.GetMouseButtonDown(0)) {
       Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -250,7 +248,6 @@ public class AgentManager : MonoBehaviour {
   GameObject _currentPlumbob;
 
   public void SelectAgent(Agent agent) {
-    _selectedAgent = agent;
 
     if (_currentPlumbob) {
       Destroy(_currentPlumbob);
