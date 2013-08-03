@@ -56,8 +56,20 @@ public class ReproductiveSystem : Organ {
     return agent.body.Lifespan() * 0.25f;
   }
 
+  public float AdulthoodTime() {
+    return agent.birthTime + ChildLength();
+  }
+
+  bool _isChild = true;
   public bool IsChild() {
-    return !agent.body.OlderThan(ChildLength());
+    return _isChild;
+  }
+
+  public float ChildScaleFactor(float factor) {
+    if (IsChild()) {
+      return factor;
+    }
+    return 1;
   }
 
   Agent _currentPartner = null;
@@ -77,6 +89,10 @@ public class ReproductiveSystem : Organ {
       GiveBirth(_currentPartner);
       _isPregnant = false;
       _currentPartner = null;
+    }
+    if (IsChild() && Time.time >= AdulthoodTime()) {
+      _isChild = false;
+      agent.Notify(AgentNotificationType.Puberty);
     }
   }
 

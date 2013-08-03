@@ -5,7 +5,6 @@ using System.Linq;
 
 public class HungerCenter : Organ {
 
-  public NumericalTrait hunger  = new NumericalTrait(0, 1); 
   public BooleanTrait carnivore = new BooleanTrait(); 
   public BooleanTrait herbivore = new BooleanTrait(); 
 

@@ -63,6 +63,8 @@ public class Agent : MonoBehaviour {
       organ.RandomizeTraits();
     }
     FinishCreating();
+    // Randomize age
+    birthTime = birthTime - (body.Lifespan() * Random.value);
   }
 
   public void CreateFromParents(Agent[] parents) {

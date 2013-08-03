@@ -13,11 +13,11 @@ public class Body : Organ {
   // Secondary Traits
 
   public float Speed() {
-    return 1 + metabolism.floatValue - size.floatValue;
+    return (1 + metabolism.floatValue - size.floatValue) * agent.reproductiveSystem.ChildScaleFactor(0.75f);
   }
 
   public float Strength() {
-    return 1 + size.floatValue;
+    return (1 + size.floatValue) * agent.reproductiveSystem.ChildScaleFactor(0.5f);
   }
 
   public float EnergyDrainPerSecond() {
