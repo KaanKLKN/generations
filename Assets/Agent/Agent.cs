@@ -217,8 +217,12 @@ public class Agent : MonoBehaviour {
       if (energy <= 0F) {
         Starve();
       }
-
-      reproductiveSystem.Update();
+      else if (Age() >= body.Lifespan()) {
+        DieOfOldAge();
+      }
+      else {
+        reproductiveSystem.Update();
+      }
 
     }
 
@@ -286,6 +290,13 @@ public class Agent : MonoBehaviour {
 
   public float Lifetime() {
     return deathTime - birthTime;
+  }
+
+  public float Age() {
+    if (dead) {
+      return Lifetime();
+    }
+    return Time.time - birthTime;
   }
 
   public float DistanceToGoal() {

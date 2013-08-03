@@ -212,33 +212,42 @@ public class AgentManager : MonoBehaviour {
   }
 
   void LateUpdate () {
-    if (Input.GetMouseButtonDown(0)) {
-      Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-      RaycastHit hit;
-      if (Physics.Raycast(ray, out hit, 10000)) {
-        Agent hitAgent = hit.collider.gameObject.GetComponent<Agent>();
-        if (hitAgent) {
-          SelectAgent(hitAgent);
+    if (Input.GetMouseButton(0)) {
+      TryToSelectAgent();
+    }
+  }
+
+  void TryToSelectAgent() {
+    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+    RaycastHit hit;
+    if (Physics.Raycast(ray, out hit, 10000)) {
+      Agent hitAgent = hit.collider.gameObject.GetComponent<Agent>();
+      if (hitAgent) {
+        SelectAgent(hitAgent);
+        return;
+      }
+      else {
+        Collider[] hitColliders = Physics.OverlapSphere(hit.point, 1);
+        int i = 0;
+        Agent closestAgent = null;
+        float closestColliderDistance = 100000000f;
+        while (i < hitColliders.Length) {
+          Agent thisAgent = hitColliders[i].gameObject.GetComponent<Agent>();
+          if (thisAgent) {
+            float distance = Vector3.Distance(hit.point, thisAgent.transform.position);
+            if (!closestAgent || distance < closestColliderDistance) {
+              closestAgent = thisAgent;
+              closestColliderDistance = distance;
+            }                
+          }
+          i++;
+        }
+        if (closestAgent) {
+          SelectAgent(closestAgent);
+          return;
         }
         else {
-          Collider[] hitColliders = Physics.OverlapSphere(hit.point, 1);
-          int i = 0;
-          Agent closestAgent = null;
-          float closestColliderDistance = 100000000f;
-          while (i < hitColliders.Length) {
-            Agent thisAgent = hitColliders[i].gameObject.GetComponent<Agent>();
-            if (thisAgent) {
-              float distance = Vector3.Distance(hit.point, thisAgent.transform.position);
-              if (!closestAgent || distance < closestColliderDistance) {
-                closestAgent = thisAgent;
-                closestColliderDistance = distance;
-              }                
-            }
-            i++;
-          }
-          if (closestAgent) {
-            SelectAgent(closestAgent);
-          }
+          SelectAgent(null);
         }
       }
     }
@@ -253,9 +262,11 @@ public class AgentManager : MonoBehaviour {
       Destroy(_currentPlumbob);
     }
 
-    _currentPlumbob = Instantiate(agentSelectionPlumbob, agent.transform.position, Quaternion.identity) as GameObject;
-    _currentPlumbob.transform.parent = agent.transform;
-    _currentPlumbob.transform.localPosition = _currentPlumbob.transform.localPosition + new Vector3(0, 1, 0);
+    if (agent) {
+      _currentPlumbob = Instantiate(agentSelectionPlumbob, agent.transform.position, Quaternion.identity) as GameObject;
+      _currentPlumbob.transform.parent = agent.transform;
+      _currentPlumbob.transform.localPosition = _currentPlumbob.transform.localPosition + new Vector3(0, 1, 0);
+    }
 
     _agentInfoPane.DisplayAgent(agent);
   }

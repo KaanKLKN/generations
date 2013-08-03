@@ -13,48 +13,88 @@ public class AgentInfoPane : MonoBehaviour {
     return GetComponent<AgentManager>();
   }
 
+  System.String _currentTabName = "Status";
+  bool Tab(System.String name) {
+    if (GUILayout.Button(name)) {
+      _currentTabName = name;
+      return true;
+    }
+    return false;
+  }
+
+  bool TabContent(System.String name){
+    return _currentTabName == name;
+  }
+
   void OnGUI() {
     if (!agent)
       return;
 
     GUILayout.BeginArea (new Rect(Screen.width - 200 - 10, 10, 200, Screen.height - 10));
+
+    GUILayout.BeginVertical ("box");
+    GUILayout.Label(agent.lastEventName);
+    GUILayout.EndVertical ();
+
+    GUILayout.BeginHorizontal();
+    Tab("Status");
+    Tab("Genetics");
+    Tab("Family");
+    GUILayout.EndHorizontal();
+
+
     GUILayout.BeginVertical ("box");
 
-    GUILayout.Label(agent.lastEventName);
-
-    GUILayout.Label("INFO");
-    GUILayout.Label("Lifespan: " + SimpleFloat(agent.body.Lifespan()) + "s (" + SimplePercent(1 - agent.energy / agent.body.MaxEnergy()) + ")");
-    GUILayout.Label("Energy: " + SimpleFloat(agent.energy));
-    GUILayout.Label("Generation: " + agent.reproductiveSystem.generation);
-
-    GUILayout.Label("INHERITED TRAITS");
-    foreach (var pair in agent.Traits()) {
-      NumericalTrait trait = pair.Value as NumericalTrait;
-      if (trait != null) {
-        GUILayout.Label(pair.Key + ": " + SimpleFloat(trait.floatValue));
-      }
+    if (TabContent("Status")) {
+      GUILayout.Label("INFO");
+      GUILayout.Label("Energy: " + SimpleFloat(agent.energy));
+      GUILayout.Label("Age: " + SimpleFloat(agent.Age()) + " / " + SimpleFloat(agent.body.Lifespan()) + "s (" + SimplePercent(1 - agent.energy / agent.body.MaxEnergy()) + ")");
     }
 
-    GUILayout.Label("CALCULATED TRAITS");
+    if (TabContent("Genetics")) {
+      GUILayout.Label("INHERITED TRAITS");
+      foreach (var pair in agent.Traits()) {
+        NumericalTrait trait = pair.Value as NumericalTrait;
+        if (trait != null) {
+          GUILayout.Label(pair.Key + ": " + SimpleFloat(trait.floatValue));
+        }
+      }
 
-    GUILayout.Label("Speed: " + SimpleFloat(agent.body.Speed()));
-    GUILayout.Label("Strength: " + SimpleFloat(agent.body.Strength()));
-    GUILayout.Label("EnergyDrainPerSecond: " + SimpleFloat(agent.body.EnergyDrainPerSecond()));
-    GUILayout.Label("MaxEnergy: " + SimpleFloat(agent.body.MaxEnergy()));
-    GUILayout.Label("CamouflageFactor: " + agent.body.CamouflageFactor());
+      GUILayout.Label("CALCULATED TRAITS");
 
+      GUILayout.Label("Speed: " + SimpleFloat(agent.body.Speed()));
+      GUILayout.Label("Strength: " + SimpleFloat(agent.body.Strength()));
+      GUILayout.Label("EnergyDrainPerSecond: " + SimpleFloat(agent.body.EnergyDrainPerSecond()));
+      GUILayout.Label("MaxEnergy: " + SimpleFloat(agent.body.MaxEnergy()));
+      GUILayout.Label("CamouflageFactor: " + agent.body.CamouflageFactor());
+    }
 
     //DrawProgressBar(new Rect(0, 0, 200, 16), agent.energy / agent.body.MaxEnergy());
 
-    Agent[] parents = agent.reproductiveSystem.parents;
-    if (parents != null) {
-      int i = 1;
-      foreach (Agent parent in parents) {
-        if (GUILayout.Button ("Select Parent " + i + " (Gen " + parent.reproductiveSystem.generation + ")")) {
-          Manager().SelectAgent(parent);
+    if (TabContent("Family")) {
+      GUILayout.Label("Generation: " + agent.reproductiveSystem.generation);
+
+      GUILayout.Label("PARENTS");
+      Agent[] parents = agent.reproductiveSystem.parents;
+      if (parents != null) {
+        int i = 1;
+        foreach (Agent parent in parents) {
+          if (GUILayout.Button ("Select Parent " + i + " (Gen " + parent.reproductiveSystem.generation + ")")) {
+            Manager().SelectAgent(parent);
+          }
+          i++;
         }
-        i++;
       }
+      if (parents == null || parents.Length < 1) {
+        GUILayout.Label("No parents");
+      }
+
+      GUILayout.Label("CHILDREN");
+      // Agent[] children = agent.reproductiveSystem.children;
+      // if (children == null || children.Length < 1) {
+      //   GUILayout.Label("No children");
+      // }
+
     }
 
     GUILayout.EndVertical ();
