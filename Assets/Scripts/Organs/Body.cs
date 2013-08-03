@@ -21,11 +21,11 @@ public class Body : Organ {
   }
 
   public float EnergyDrainPerSecond() {
-    return metabolism.floatValue * 2;
+    return 0.5f + metabolism.floatValue * 3;
   }
 
   public float MaxEnergy() {
-    return 15 + 30 * metabolism.InverseFloatValue();
+    return 15 + 45 * metabolism.InverseFloatValue();
   }
 
   public float Lifespan() {

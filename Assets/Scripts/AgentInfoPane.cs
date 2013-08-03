@@ -42,6 +42,8 @@ public class AgentInfoPane : MonoBehaviour {
     GUILayout.Label("Lifespan: " + agent.body.Lifespan() + "s");
     GUILayout.Label("Generation: " + agent.reproductiveSystem.generation);
 
+    //DrawProgressBar(new Rect(0, 0, 200, 16), agent.energy / agent.body.MaxEnergy());
+
     Agent[] parents = agent.reproductiveSystem.parents;
     if (parents != null) {
       int i = 1;
@@ -57,5 +59,26 @@ public class AgentInfoPane : MonoBehaviour {
     GUILayout.EndArea ();
 
   }
+
+  public Texture2D progressBarFull;
+  public Texture2D progressBarEmpty;
+
+  void DrawProgressBar(Rect rect, float percentage) {
+
+    Vector2 size = new Vector2(rect.width, rect.height);
+    Vector2 pos = new Vector2(rect.x, rect.y);
+
+    GUI.BeginGroup(new Rect (pos.x, pos.y, size.x, size.y));
+        GUI.Box (new Rect(0,0, size.x, size.y), progressBarEmpty);
+ 
+        // draw the filled-in part:
+        GUI.BeginGroup (new Rect (0, 0, size.x * percentage, size.y));
+            GUI.Box (new Rect (0,0, size.x, size.y), progressBarFull);
+        GUI.EndGroup ();
+ 
+    GUI.EndGroup();
+ 
+  } 
+
 
 }
