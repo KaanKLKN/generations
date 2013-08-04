@@ -122,6 +122,7 @@ QualitySettings:
     excludedTargetPlatforms: []
   m_PerPlatformDefaultQuality:
     Android: 2
+    BlackBerry: 0
     FlashPlayer: 3
     GLES Emulation: 3
     PS3: 3
