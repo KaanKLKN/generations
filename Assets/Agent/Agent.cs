@@ -78,6 +78,7 @@ public class Agent : MonoBehaviour {
   }
 
   void FinishCreating() {
+    renderer.enabled = true;
     dead = false;
     finished = false;
     energy = body.MaxEnergy();
@@ -89,7 +90,7 @@ public class Agent : MonoBehaviour {
     DescribeAIState("Spawned");
     UpdateAI();
   }
-    
+
   Material recoloredMaterial;
   public void SetColor(Color color) {
       if (recoloredMaterial == null) {
@@ -151,7 +152,7 @@ public class Agent : MonoBehaviour {
     MapTile[] rejectedNearby = RejectPreviousTiles(nearby);
     if (rejectedNearby.Length > 0) {
       MapTile randomTile = rejectedNearby[Random.Range(0, rejectedNearby.Length)];
-      MoveToTile(randomTile);      
+      MoveToTile(randomTile);
       DescribeAIState("Heading to random tile");
     }
 
@@ -302,6 +303,7 @@ public class Agent : MonoBehaviour {
 
   void EraseBody() {
     renderer.enabled = false;
+    manager.OnAgentBecameRecyclable(this);
   }
 
   public float Fitness() {

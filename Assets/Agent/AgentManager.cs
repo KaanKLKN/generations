@@ -7,7 +7,7 @@ public struct TraitStatistic {
    public string name;
    public float floatValue;
    public Trait trait;
-   public TraitStatistic(string n, float value, Trait t) 
+   public TraitStatistic(string n, float value, Trait t)
    {
       floatValue = value;
       name = n;
@@ -18,7 +18,7 @@ public struct TraitStatistic {
 public class AgentManager : MonoBehaviour {
 
   public Map map;
-  
+
   public int startingPopulation = 150;
   public int populationCeiling  = 500;
 
@@ -54,7 +54,7 @@ public class AgentManager : MonoBehaviour {
 
   int previousDead;
   int previousFinished;
-  
+
   void Generate(Agent[] previousAgents) {
     generation++;
 
@@ -70,7 +70,7 @@ public class AgentManager : MonoBehaviour {
 
     currentAgents = new ArrayList();
     ResetCounters();
-    
+
     deadAgents = 0;
     finishedAgents = 0;
 
@@ -86,12 +86,25 @@ public class AgentManager : MonoBehaviour {
   }
 
   public Agent BirthAgent() {
-    GameObject agentObject = Instantiate(agentPrefab, Vector3.zero, Quaternion.identity) as GameObject;
-    agentObject.transform.parent = this.transform;
 
-    Agent agent = agentObject.GetComponent<Agent>();
+    GameObject agentObject;
+    Agent agent;
+    if (recyclableAgents.Count > 0) {
+      // We can recycle a dead agent.
+      agent = recyclableAgents[0] as Agent;
+      agentObject = agent.gameObject;
+      recyclableAgents.Remove(agent);
+    }
+    else {
+      // We need to instantiate a new agent.
+      agentObject = Instantiate(agentPrefab, Vector3.zero, Quaternion.identity) as GameObject;
+      agentObject.transform.parent = this.transform;
+      agent = agentObject.GetComponent<Agent>();
+    }
+
     agent.InitializeAgent();
     agent.manager = this;
+
     if (placeInGroup) {
       agent.currentTile = map.startTile;//map.RandomTile();
     }
@@ -117,6 +130,11 @@ public class AgentManager : MonoBehaviour {
     CheckGenerationComplete();
     currentAgents.Remove(deadAgent);
     DidUpdateTraits();
+  }
+
+  ArrayList recyclableAgents = new ArrayList();
+  public void OnAgentBecameRecyclable(Agent deadAgent) {
+    recyclableAgents.Add(deadAgent);
   }
 
   int LivingAgents() {
@@ -240,7 +258,7 @@ public class AgentManager : MonoBehaviour {
             if (!closestAgent || distance < closestColliderDistance) {
               closestAgent = thisAgent;
               closestColliderDistance = distance;
-            }                
+            }
           }
           i++;
         }
@@ -322,5 +340,5 @@ public class AgentManager : MonoBehaviour {
     }
     return "" + delta;
   }
-  
+
 }

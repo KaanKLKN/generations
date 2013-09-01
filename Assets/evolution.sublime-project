@@ -2,8 +2,8 @@
 	"folders":
 	[
 		{
-			"path": "/Users/wil/Code/fitness/Assets",
-                "file_exclude_patterns": ["*.meta", "*.unity", "*.mat"]
+      "path": ".",
+      "file_exclude_patterns": ["*.meta", "*.unity", "*.mat"]
 		}
 	]
 }
